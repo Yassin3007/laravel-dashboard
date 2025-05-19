@@ -71,7 +71,7 @@ class CrudGeneratorCommand extends Command
         $this->info('Creating CRUD for: ' . $modelName);
 
         // Create each component
-        $this->createModel($modelName, $fields, $relationships);
+        $this->createModel($modelName, $tableName, $fields, $relationships);
         $this->createMigration($tableName, $fields);
         $this->createController($modelName, $withResource);
         $this->createViews($modelName, $tableName, $fields);
@@ -98,7 +98,7 @@ class CrudGeneratorCommand extends Command
      * @param array $relationships
      * @return void
      */
-    protected function createModel($modelName, $fields, $relationships)
+    protected function createModel($modelName, $tableName, $fields, $relationships)
     {
         $this->info('Creating Model: ' . $modelName);
 
@@ -142,6 +142,7 @@ class CrudGeneratorCommand extends Command
 
         // Replace placeholders
         $modelTemplate = str_replace('{{modelName}}', $modelName, $modelTemplate);
+        $modelTemplate = str_replace('{{tableName}}', $tableName, $modelTemplate);  // Add this line to replace table name
         $modelTemplate = str_replace('{{fillable}}', implode(', ', $fillable), $modelTemplate);
         $modelTemplate = str_replace('{{relationships}}', implode("\n\n    ", $relationshipMethods), $modelTemplate);
 
@@ -153,6 +154,7 @@ class CrudGeneratorCommand extends Command
         // Save model file
         File::put(app_path('Models/' . $modelName . '.php'), $modelTemplate);
     }
+
 
     /**
      * Create the migration.
@@ -386,6 +388,7 @@ class CrudGeneratorCommand extends Command
         $indexTemplate = str_replace('{{modelName}}', $modelName, $indexTemplate);
         $indexTemplate = str_replace('{{modelNamePlural}}', Str::plural($modelName), $indexTemplate);
         $indexTemplate = str_replace('{{modelNamePluralLowerCase}}', Str::camel(Str::plural($modelName)), $indexTemplate);
+        $indexTemplate = str_replace('{{modelNameSingularLowerCase}}', Str::camel($modelName), $indexTemplate); // Add this line to fix the bug
         $indexTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $indexTemplate);
         $indexTemplate = str_replace('{{tableHeaders}}', implode("\n                ", $tableHeaders), $indexTemplate);
         $indexTemplate = str_replace('{{tableRows}}', implode("\n                ", $tableRows), $indexTemplate);
@@ -433,7 +436,6 @@ class CrudGeneratorCommand extends Command
 
         File::put($viewPath . '/show.blade.php', $showTemplate);
     }
-
     /**
      * Create the form request class.
      *
@@ -572,7 +574,7 @@ class CrudGeneratorCommand extends Command
     {
         $this->info('Adding Sidebar Item for: ' . $modelName);
 
-        $sidebarFile = resource_path('views/layouts/sidebar.blade.php');
+        $sidebarFile = resource_path('views/dashboard/layouts/menu.blade.php');
 
         // Create sidebar file if it doesn't exist
         if (!File::exists($sidebarFile)) {
@@ -581,28 +583,24 @@ class CrudGeneratorCommand extends Command
 
         $sidebarContent = File::get($sidebarFile);
 
-        // Create sidebar item
+        // Create sidebar item in the format that matches the template
         $routeName = Str::kebab(Str::plural($modelName));
         $modelNamePlural = Str::plural($modelName);
-        $icon = 'fa-list'; // Default icon
+        $modelNameTitle = Str::title(str_replace('_', ' ', $modelNamePlural));
 
+        // Format for the new menu item based on the provided template
         $sidebarItem = "
-    <li class=\"nav-item\">
-        <a href=\"{{ route('" . $routeName . ".index') }}\" class=\"nav-link {{ request()->is('" . $routeName . "*') ? 'active' : '' }}\">
-            <i class=\"nav-icon fas " . $icon . "\"></i>
-            <p>" . Str::title(str_replace('_', ' ', $modelNamePlural)) . "</p>
-        </a>
-    </li>";
+<li class=\" nav-item\"><a href=\"{{ route('$routeName.index') }}\"><i class=\"icon-list\"></i><span data-i18n=\"nav.$routeName.main\" class=\"menu-title\">$modelNameTitle</span></a>
+</li>";
 
-        // Find the sidebar-menu element
-        $menuPos = strpos($sidebarContent, '<ul class="nav nav-pills nav-sidebar flex-column"');
-        if ($menuPos !== false) {
-            // Find the end of the ul
-            $endPos = strpos($sidebarContent, '</ul>', $menuPos);
-            if ($endPos !== false) {
-                // Insert the new item before the end of the ul
-                $sidebarContent = substr_replace($sidebarContent, $sidebarItem . "\n", $endPos, 0);
-            }
+        // Find a good place to insert the new menu item - after the last </li> tag
+        $lastPos = strrpos($sidebarContent, '</li>');
+        if ($lastPos !== false) {
+            // Insert after the last </li> tag
+            $sidebarContent = substr_replace($sidebarContent, "\n$sidebarItem", $lastPos + 5, 0);
+        } else {
+            // Fallback: Just append to the end
+            $sidebarContent .= $sidebarItem;
         }
 
         // Save updated sidebar file
@@ -687,168 +685,304 @@ class CrudGeneratorCommand extends Command
      * @param string $name
      * @return string
      */
+
+
     protected function loadViewTemplate($name)
     {
-        // First check if the template exists in the custom templates directory
+        // First check if the template exists in the templates directory
         $templatePath = resource_path('views/templates/' . $name . '.blade.php');
 
         if (File::exists($templatePath)) {
+            // Use the template from the templates directory
             return File::get($templatePath);
         }
 
-        // Otherwise use updated stubs based on the new template design
-        switch ($name) {
-            case 'create':
-                return '@extends(\'dashboard.layouts.master\')
+        // If template doesn't exist in the templates directory, check in stubs directory
+        $stubPath = app_path('Console/Commands/stubs/views/' . $name . '.stub');
 
-@section(\'content\')
-    <div class="app-content content container-fluid">
-        <div class="content-wrapper">
-            <div class="content-header row">
-                <div class="content-header-left col-md-6 col-xs-12 mb-1">
-                    <h2 class="content-header-title">Create {{modelName}}</h2>
-                </div>
-                <div class="content-header-right breadcrumbs-right breadcrumbs-top col-md-6 col-xs-12">
-                    <div class="breadcrumb-wrapper col-xs-12">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route(\'dashboard\') }}">Dashboard</a>
-                            </li>
-                            <li class="breadcrumb-item"><a href="{{ route(\'{{viewPath}}.index\') }}">{{modelName}} Management</a>
-                            </li>
-                            <li class="breadcrumb-item active">Create New {{modelName}}
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-            <div class="content-body">
-                <section id="basic-form-layouts">
-                    <div class="row match-height">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h4 class="card-title" id="basic-layout-tooltip">Create New {{modelName}}</h4>
-                                    <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
-                                    <div class="heading-elements">
-                                        <ul class="list-inline mb-0">
-                                            <li><a data-action="collapse"><i class="icon-minus4"></i></a></li>
-                                            <li><a data-action="reload"><i class="icon-reload"></i></a></li>
-                                            <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
-                                            <li><a data-action="close"><i class="icon-cross2"></i></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="card-body collapse in">
-                                    <div class="card-block">
-                                        <div class="card-text">
-                                            <p>Please fill in all required fields to create a new {{modelName}}.</p>
-                                        </div>
-
-                                        <form class="form" method="POST" action="{{ route(\'{{viewPath}}.store\') }}" enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="form-body">
-                                                {{formFields}}
-                                            </div>
-
-                                            <div class="form-actions">
-                                                <a href="{{ route(\'{{viewPath}}.index\') }}" class="btn btn-warning mr-1">
-                                                    <i class="icon-cross2"></i> Cancel
-                                                </a>
-                                                <button type="submit" class="btn btn-primary">
-                                                    <i class="icon-check2"></i> Save
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </div>
-@endsection';
-
-            case 'edit':
-                return '@extends(\'dashboard.layouts.master\')
-
-@section(\'content\')
-    <div class="app-content content container-fluid">
-        <div class="content-wrapper">
-            <div class="content-header row">
-                <div class="content-header-left col-md-6 col-xs-12 mb-1">
-                    <h2 class="content-header-title">Edit {{modelName}}</h2>
-                </div>
-                <div class="content-header-right breadcrumbs-right breadcrumbs-top col-md-6 col-xs-12">
-                    <div class="breadcrumb-wrapper col-xs-12">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route(\'dashboard\') }}">Dashboard</a>
-                            </li>
-                            <li class="breadcrumb-item"><a href="{{ route(\'{{viewPath}}.index\') }}">{{modelName}} Management</a>
-                            </li>
-                            <li class="breadcrumb-item active">Edit {{modelName}}
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-            <div class="content-body">
-                <section id="basic-form-layouts">
-                    <div class="row match-height">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h4 class="card-title" id="basic-layout-tooltip">Edit {{modelName}} #{{ ${{modelNameLowerCase}}->id }}</h4>
-                                    <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
-                                    <div class="heading-elements">
-                                        <ul class="list-inline mb-0">
-                                            <li><a data-action="collapse"><i class="icon-minus4"></i></a></li>
-                                            <li><a data-action="reload"><i class="icon-reload"></i></a></li>
-                                            <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
-                                            <li><a data-action="close"><i class="icon-cross2"></i></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="card-body collapse in">
-                                    <div class="card-block">
-                                        <div class="card-text">
-                                            <p>Update the information for this {{modelName}}.</p>
-                                        </div>
-
-                                        <form class="form" method="POST" action="{{ route(\'{{viewPath}}.update\', ${{modelNameLowerCase}}->id) }}" enctype="multipart/form-data">
-                                            @csrf
-                                            @method(\'PUT\')
-                                            <div class="form-body">
-                                                {{formFields}}
-                                            </div>
-
-                                            <div class="form-actions">
-                                                <a href="{{ route(\'{{viewPath}}.index\') }}" class="btn btn-warning mr-1">
-                                                    <i class="icon-cross2"></i> Cancel
-                                                </a>
-                                                <button type="submit" class="btn btn-primary">
-                                                    <i class="icon-check2"></i> Update
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </div>
-@endsection';
-
-            // Add other view templates as needed for index, show, etc.
-            default:
-                // Use original stub if the new template is not provided
-                return File::get(app_path('Console/Commands/stubs/views/' . $name . '.stub'));
+        if (File::exists($stubPath)) {
+            return File::get($stubPath);
         }
+
+        // If no template is found, throw an exception
+        throw new \Exception("Template file for '{$name}' not found. Please create the template in resources/views/templates/{$name}.blade.php");
     }
+
+
+
+
+
+//    protected function loadViewTemplate($name)
+//    {
+//        // First check if the template exists in the custom templates directory
+//        $templatePath = resource_path('views/templates/' . $name . '.blade.php');
+//
+//        if (File::exists($templatePath)) {
+//            return File::get($templatePath);
+//        }
+//
+//        // Otherwise use updated stubs based on the new template design
+//        switch ($name) {
+//            case 'index':
+//                return '@extends(\'dashboard.layouts.master\')
+//
+//@section(\'content\')
+//    <div class="app-content content container-fluid">
+//        <div class="content-wrapper">
+//            <div class="content-header row">
+//                <div class="content-header-left col-md-6 col-xs-12 mb-1">
+//                    <h2 class="content-header-title">{{modelNamePlural}} Management</h2>
+//                </div>
+//                <div class="content-header-right breadcrumbs-right breadcrumbs-top col-md-6 col-xs-12">
+//                    <div class="breadcrumb-wrapper col-xs-12">
+//                        <ol class="breadcrumb">
+//                            <li class="breadcrumb-item"><a href="{{ route(\'dashboard\') }}">Dashboard</a>
+//                            </li>
+//                            <li class="breadcrumb-item active">{{modelNamePlural}}
+//                            </li>
+//                        </ol>
+//                    </div>
+//                </div>
+//            </div>
+//            <div class="content-body">
+//                <!-- Table head options start -->
+//                <div class="row">
+//                    <div class="col-xs-12">
+//                        <div class="card">
+//                            <div class="card-header">
+//                                <h4 class="card-title">{{modelNamePlural}} List</h4>
+//                                <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
+//                                <div class="heading-elements">
+//                                    <ul class="list-inline mb-0">
+//                                        <li><a data-action="collapse"><i class="icon-minus4"></i></a></li>
+//                                        <li><a data-action="reload"><i class="icon-reload"></i></a></li>
+//                                        <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
+//                                        <li><a data-action="close"><i class="icon-cross2"></i></a></li>
+//                                    </ul>
+//                                </div>
+//                            </div>
+//                            <div class="card-body collapse in">
+//                                <div class="card-block card-dashboard">
+//                                    <a href="{{ route(\'{{viewPath}}.create\') }}" class="btn btn-primary mb-1">
+//                                        <i class="icon-plus2"></i> Add New {{modelName}}
+//                                    </a>
+//                                </div>
+//                                <div class="table-responsive">
+//                                    <table class="table">
+//                                        <thead class="thead-inverse">
+//                                        <tr>
+//                                            <th>#</th>
+//                                            {{tableHeaders}}
+//                                            <th>Actions</th>
+//                                        </tr>
+//                                        </thead>
+//                                        <tbody>
+//                                        @forelse(${{modelNamePluralLowerCase}} as ${{modelNameSingularLowerCase}})
+//                                            <tr>
+//                                                <th scope="row">{{ $loop->iteration }}</th>
+//                                                {{tableRows}}
+//                                                <td>
+//                                                    <a href="{{ route(\'{{viewPath}}.show\', ${{modelNameSingularLowerCase}}->id) }}" class="btn btn-info btn-sm">
+//                                                        <i class="icon-eye6"></i> View
+//                                                    </a>
+//                                                    <a href="{{ route(\'{{viewPath}}.edit\', ${{modelNameSingularLowerCase}}->id) }}" class="btn btn-warning btn-sm">
+//                                                        <i class="icon-pencil3"></i> Edit
+//                                                    </a>
+//                                                    <form action="{{ route(\'{{viewPath}}.destroy\', ${{modelNameSingularLowerCase}}->id) }}" method="POST" style="display: inline-block;">
+//                                                        @csrf
+//                                                        @method(\'DELETE\')
+//                                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to delete this {{modelName}}?\');">
+//                                                            <i class="icon-trash4"></i> Delete
+//                                                        </button>
+//                                                    </form>
+//                                                </td>
+//                                            </tr>
+//                                        @empty
+//                                            <tr>
+//                                                <td colspan="{{ 2 + count(Schema::getColumnListing(\'{{viewPath}}\')) }}" class="text-center">No {{modelNamePlural}} found.</td>
+//                                            </tr>
+//                                        @endforelse
+//                                        </tbody>
+//                                    </table>
+//                                </div>
+//                            </div>
+//                        </div>
+//                    </div>
+//                </div>
+//                <!-- Table head options end -->
+//            </div>
+//        </div>
+//    </div>
+//@endsection';
+//
+//            case 'create':
+//                return '@extends(\'dashboard.layouts.master\')
+//
+//@section(\'content\')
+//    <div class="app-content content container-fluid">
+//        <div class="content-wrapper">
+//            <div class="content-header row">
+//                <div class="content-header-left col-md-6 col-xs-12 mb-1">
+//                    <h2 class="content-header-title">Create {{modelName}}</h2>
+//                </div>
+//                <div class="content-header-right breadcrumbs-right breadcrumbs-top col-md-6 col-xs-12">
+//                    <div class="breadcrumb-wrapper col-xs-12">
+//                        <ol class="breadcrumb">
+//                            <li class="breadcrumb-item"><a href="{{ route(\'dashboard\') }}">Dashboard</a>
+//                            </li>
+//                            <li class="breadcrumb-item"><a href="{{ route(\'{{viewPath}}.index\') }}">{{modelName}} Management</a>
+//                            </li>
+//                            <li class="breadcrumb-item active">Create New {{modelName}}
+//                            </li>
+//                        </ol>
+//                    </div>
+//                </div>
+//            </div>
+//            <div class="content-body">
+//                <section id="basic-form-layouts">
+//                    <div class="row match-height">
+//                        <div class="col-md-12">
+//                            <div class="card">
+//                                <div class="card-header">
+//                                    <h4 class="card-title" id="basic-layout-tooltip">Create New {{modelName}}</h4>
+//                                    <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
+//                                    <div class="heading-elements">
+//                                        <ul class="list-inline mb-0">
+//                                            <li><a data-action="collapse"><i class="icon-minus4"></i></a></li>
+//                                            <li><a data-action="reload"><i class="icon-reload"></i></a></li>
+//                                            <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
+//                                            <li><a data-action="close"><i class="icon-cross2"></i></a></li>
+//                                        </ul>
+//                                    </div>
+//                                </div>
+//                                <div class="card-body collapse in">
+//                                    <div class="card-block">
+//                                        <div class="card-text">
+//                                            <p>Please fill in all required fields to create a new {{modelName}}.</p>
+//                                        </div>
+//
+//                                        <form class="form" method="POST" action="{{ route(\'{{viewPath}}.store\') }}" enctype="multipart/form-data">
+//                                            @csrf
+//                                            <div class="form-body">
+//                                                {{formFields}}
+//                                            </div>
+//
+//                                            <div class="form-actions">
+//                                                <a href="{{ route(\'{{viewPath}}.index\') }}" class="btn btn-warning mr-1">
+//                                                    <i class="icon-cross2"></i> Cancel
+//                                                </a>
+//                                                <button type="submit" class="btn btn-primary">
+//                                                    <i class="icon-check2"></i> Save
+//                                                </button>
+//                                            </div>
+//                                        </form>
+//                                    </div>
+//                                </div>
+//                            </div>
+//                        </div>
+//                    </div>
+//                </section>
+//            </div>
+//        </div>
+//    </div>
+//@endsection';
+//
+//            case 'edit':
+//                return '@extends(\'dashboard.layouts.master\')
+//
+//@section(\'content\')
+//    <div class="app-content content container-fluid">
+//        <div class="content-wrapper">
+//            <div class="content-header row">
+//                <div class="content-header-left col-md-6 col-xs-12 mb-1">
+//                    <h2 class="content-header-title">Edit {{modelName}}</h2>
+//                </div>
+//                <div class="content-header-right breadcrumbs-right breadcrumbs-top col-md-6 col-xs-12">
+//                    <div class="breadcrumb-wrapper col-xs-12">
+//                        <ol class="breadcrumb">
+//                            <li class="breadcrumb-item"><a href="{{ route(\'dashboard\') }}">Dashboard</a>
+//                            </li>
+//                            <li class="breadcrumb-item"><a href="{{ route(\'{{viewPath}}.index\') }}">{{modelName}} Management</a>
+//                            </li>
+//                            <li class="breadcrumb-item active">Edit {{modelName}}
+//                            </li>
+//                        </ol>
+//                    </div>
+//                </div>
+//            </div>
+//            <div class="content-body">
+//                <section id="basic-form-layouts">
+//                    <div class="row match-height">
+//                        <div class="col-md-12">
+//                            <div class="card">
+//                                <div class="card-header">
+//                                    <h4 class="card-title" id="basic-layout-tooltip">Edit {{modelName}} #{{ ${{modelNameLowerCase}}->id }}</h4>
+//                                    <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
+//                                    <div class="heading-elements">
+//                                        <ul class="list-inline mb-0">
+//                                            <li><a data-action="collapse"><i class="icon-minus4"></i></a></li>
+//                                            <li><a data-action="reload"><i class="icon-reload"></i></a></li>
+//                                            <li><a data-action="expand"><i class="icon-expand2"></i></a></li>
+//                                            <li><a data-action="close"><i class="icon-cross2"></i></a></li>
+//                                        </ul>
+//                                    </div>
+//                                </div>
+//                                <div class="card-body collapse in">
+//                                    <div class="card-block">
+//                                        <div class="card-text">
+//                                            <p>Update the information for this {{modelName}}.</p>
+//                                        </div>
+//
+//                                        <form class="form" method="POST" action="{{ route(\'{{viewPath}}.update\', ${{modelNameLowerCase}}->id) }}" enctype="multipart/form-data">
+//                                            @csrf
+//                                            @method(\'PUT\')
+//                                            <div class="form-body">
+//                                                {{formFields}}
+//                                            </div>
+//
+//                                            <div class="form-actions">
+//                                                <a href="{{ route(\'{{viewPath}}.index\') }}" class="btn btn-warning mr-1">
+//                                                    <i class="icon-cross2"></i> Cancel
+//                                                </a>
+//                                                <button type="submit" class="btn btn-primary">
+//                                                    <i class="icon-check2"></i> Update
+//                                                </button>
+//                                            </div>
+//                                        </form>
+//                                    </div>
+//                                </div>
+//                            </div>
+//                        </div>
+//                    </div>
+//                </section>
+//            </div>
+//        </div>
+//    </div>
+//@endsection';
+//
+//            // Add other view templates as needed for show, etc.
+//            default:
+//                // Use original stub if the new template is not provided
+//                return File::get(app_path('Console/Commands/stubs/views/' . $name . '.stub'));
+//        }
+//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * Generate form field based on column type.
      *

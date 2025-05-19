@@ -21,10 +21,7 @@ class {{modelName}} extends Model
      *
      * @return string
      */
-    public function getTable()
-    {
-        return '{{ Illuminate\Support\Str::snake(Illuminate\Support\Str::plural('{{modelName}}')) }}';
-    }
+
 
     {{relationships}}
 }
