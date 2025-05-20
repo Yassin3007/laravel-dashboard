@@ -65,7 +65,8 @@ class CrudGeneratorCommand extends Command
         $withResource = $this->option('with-resource');
 
         // Check if we need to add permissions
-        $withPermissions = $this->option('with-permissions');
+//        $withPermissions = $this->option('with-permissions');
+        $withPermissions = true;
 
         // Begin the process
         $this->info('Creating CRUD for: ' . $modelName);
@@ -280,12 +281,12 @@ class CrudGeneratorCommand extends Command
         $controllerTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $controllerTemplate);
 
         // Create directories if needed
-        if (!File::exists(app_path('Http/Controllers'))) {
-            File::makeDirectory(app_path('Http/Controllers'), 0755, true);
+        if (!File::exists(app_path('Http/Controllers/Dashboard'))) {
+            File::makeDirectory(app_path('Http/Controllers/Dashboard'), 0755, true);
         }
 
         // Save controller file
-        File::put(app_path('Http/Controllers/' . $modelName . 'Controller.php'), $controllerTemplate);
+        File::put(app_path('Http/Controllers/Dashboard/' . $modelName . 'Controller.php'), $controllerTemplate);
     }
 
     /**
@@ -300,7 +301,7 @@ class CrudGeneratorCommand extends Command
     {
         $this->info('Creating Views for: ' . $modelName);
 
-        $viewPath = resource_path('views/' . Str::kebab(Str::plural($modelName)));
+        $viewPath = resource_path('views/dashboard/' . Str::kebab(Str::plural($modelName)));
 
         if (!File::exists($viewPath)) {
             File::makeDirectory($viewPath, 0755, true);
@@ -388,7 +389,7 @@ class CrudGeneratorCommand extends Command
         $indexTemplate = str_replace('{{modelName}}', $modelName, $indexTemplate);
         $indexTemplate = str_replace('{{modelNamePlural}}', Str::plural($modelName), $indexTemplate);
         $indexTemplate = str_replace('{{modelNamePluralLowerCase}}', Str::camel(Str::plural($modelName)), $indexTemplate);
-        $indexTemplate = str_replace('{{modelNameSingularLowerCase}}', Str::camel($modelName), $indexTemplate); // Add this line to fix the bug
+        $indexTemplate = str_replace('{{modelNameSingularLowerCase}}', Str::camel($modelName), $indexTemplate);
         $indexTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $indexTemplate);
         $indexTemplate = str_replace('{{tableHeaders}}', implode("\n                ", $tableHeaders), $indexTemplate);
         $indexTemplate = str_replace('{{tableRows}}', implode("\n                ", $tableRows), $indexTemplate);
@@ -486,24 +487,44 @@ class CrudGeneratorCommand extends Command
         // Generate route code
         $controllerClass = $modelName . 'Controller';
         $routeName = Str::kebab(Str::plural($modelName));
+        $modelNameLower = Str::lower($modelName);
+        $modelNameCamel = Str::camel($modelName);
 
-        if ($withResource) {
-            $newRoute = "Route::resource('" . $routeName . "', " . $controllerClass . "::class);";
-        } else {
-            $newRoute = "Route::controller(" . $controllerClass . "::class)->group(function() {
-    Route::get('" . $routeName . "', 'index')->name('" . $routeName . ".index');
-    Route::get('" . $routeName . "/create', 'create')->name('" . $routeName . ".create');
-    Route::post('" . $routeName . "', 'store')->name('" . $routeName . ".store');
-    Route::get('" . $routeName . "/{" . Str::camel($modelName) . "}', 'show')->name('" . $routeName . ".show');
-    Route::get('" . $routeName . "/{" . Str::camel($modelName) . "}/edit', 'edit')->name('" . $routeName . ".edit');
-    Route::put('" . $routeName . "/{" . Str::camel($modelName) . "}', 'update')->name('" . $routeName . ".update');
-    Route::delete('" . $routeName . "/{" . Str::camel($modelName) . "}', 'destroy')->name('" . $routeName . ".destroy');
+        // Always use individual routes with permissions (ignore $withResource flag)
+        $newRoute = "// Routes for $modelName
+Route::middleware(['auth'])->group(function() {
+    Route::get('$routeName', [$controllerClass::class, 'index'])
+        ->name('$routeName.index')
+        ->middleware('can:view_$modelNameLower');
+
+    Route::get('$routeName/create', [$controllerClass::class, 'create'])
+        ->name('$routeName.create')
+        ->middleware('can:create_$modelNameLower');
+
+    Route::post('$routeName', [$controllerClass::class, 'store'])
+        ->name('$routeName.store')
+        ->middleware('can:create_$modelNameLower');
+
+    Route::get('$routeName/{$modelNameCamel}', [$controllerClass::class, 'show'])
+        ->name('$routeName.show')
+        ->middleware('can:view_$modelNameLower');
+
+    Route::get('$routeName/{$modelNameCamel}/edit', [$controllerClass::class, 'edit'])
+        ->name('$routeName.edit')
+        ->middleware('can:edit_$modelNameLower');
+
+    Route::put('$routeName/{$modelNameCamel}', [$controllerClass::class, 'update'])
+        ->name('$routeName.update')
+        ->middleware('can:edit_$modelNameLower');
+
+    Route::delete('$routeName/{$modelNameCamel}', [$controllerClass::class, 'destroy'])
+        ->name('$routeName.destroy')
+        ->middleware('can:delete_$modelNameLower');
 });";
-        }
 
         // Check if we need to add use statement for the controller
-        if (strpos($routesContent, 'use App\Http\Controllers\\' . $controllerClass) === false) {
-            $useStatement = 'use App\Http\Controllers\\' . $controllerClass . ';';
+        if (strpos($routesContent, 'use App\Http\Controllers\Dashboard\\' . $controllerClass) === false) {
+            $useStatement = 'use App\Http\Controllers\Dashboard\\' . $controllerClass . ';';
 
             // Find the last use statement
             $lastUsePos = strrpos($routesContent, 'use ');
@@ -524,44 +545,43 @@ class CrudGeneratorCommand extends Command
         // Save updated routes file
         File::put($routesFile, $routesContent);
     }
-
     /**
      * Add permissions for the CRUD module.
      *
      * @param string $modelName
      * @return void
      */
-    protected function addPermissions($modelName)
-    {
-        $this->info('Adding Permissions for: ' . $modelName);
-
-        // Check if Spatie Permission package is installed
-        if (!class_exists('\Spatie\Permission\Models\Permission')) {
-            $this->warn('Spatie Permission package is not installed. Skipping permission creation.');
-            return;
-        }
-
-        // Get the model name in lower case
-        $modelNameLower = Str::lower($modelName);
-
-        // Define permissions
-        $permissions = [
-            'view_' . $modelNameLower,
-            'create_' . $modelNameLower,
-            'edit_' . $modelNameLower,
-            'delete_' . $modelNameLower,
-        ];
-
-        // Create each permission
-        foreach ($permissions as $permission) {
-            if (!\Spatie\Permission\Models\Permission::where('name', $permission)->exists()) {
-                \Spatie\Permission\Models\Permission::create(['name' => $permission]);
-                $this->info('Permission created: ' . $permission);
-            } else {
-                $this->info('Permission already exists: ' . $permission);
-            }
-        }
-    }
+//    protected function addPermissions($modelName)
+//    {
+//        $this->info('Adding Permissions for: ' . $modelName);
+//
+//        // Check if Spatie Permission package is installed
+//        if (!class_exists('\Spatie\Permission\Models\Permission')) {
+//            $this->warn('Spatie Permission package is not installed. Skipping permission creation.');
+//            return;
+//        }
+//
+//        // Get the model name in lower case
+//        $modelNameLower = Str::lower($modelName);
+//
+//        // Define permissions
+//        $permissions = [
+//            'view_' . $modelNameLower,
+//            'create_' . $modelNameLower,
+//            'edit_' . $modelNameLower,
+//            'delete_' . $modelNameLower,
+//        ];
+//
+//        // Create each permission
+//        foreach ($permissions as $permission) {
+//            if (!\Spatie\Permission\Models\Permission::where('name', $permission)->exists()) {
+//                \Spatie\Permission\Models\Permission::create(['name' => $permission]);
+//                $this->info('Permission created: ' . $permission);
+//            } else {
+//                $this->info('Permission already exists: ' . $permission);
+//            }
+//        }
+//    }
 
     /**
      * Add sidebar item for the CRUD module.
@@ -587,11 +607,14 @@ class CrudGeneratorCommand extends Command
         $routeName = Str::kebab(Str::plural($modelName));
         $modelNamePlural = Str::plural($modelName);
         $modelNameTitle = Str::title(str_replace('_', ' ', $modelNamePlural));
+        $modelNameLower = Str::lower($modelName);
 
-        // Format for the new menu item based on the provided template
+        // Format for the new menu item with permission check
         $sidebarItem = "
+@can('view_$modelNameLower')
 <li class=\" nav-item\"><a href=\"{{ route('$routeName.index') }}\"><i class=\"icon-list\"></i><span data-i18n=\"nav.$routeName.main\" class=\"menu-title\">$modelNameTitle</span></a>
-</li>";
+</li>
+@endcan";
 
         // Find a good place to insert the new menu item - after the last </li> tag
         $lastPos = strrpos($sidebarContent, '</li>');
@@ -1146,5 +1169,48 @@ class CrudGeneratorCommand extends Command
         }
     }
 
+
+    protected function addPermissions($modelName)
+    {
+        $this->info('Adding Permissions for: ' . $modelName);
+
+        // Check if Spatie Permission package is installed
+        if (!class_exists('\Spatie\Permission\Models\Permission')) {
+            $this->warn('Spatie Permission package is not installed. Skipping permission creation.');
+            return;
+        }
+
+        // Get the model name in lower case
+        $modelNameLower = Str::lower($modelName);
+
+        // Define permissions
+        $permissions = [
+            'view_' . $modelNameLower,
+            'create_' . $modelNameLower,
+            'edit_' . $modelNameLower,
+            'delete_' . $modelNameLower,
+        ];
+
+        // Create each permission
+        foreach ($permissions as $permission) {
+            if (!\Spatie\Permission\Models\Permission::where('name', $permission)->exists()) {
+                \Spatie\Permission\Models\Permission::create(['name' => $permission]);
+                $this->info('Permission created: ' . $permission);
+            } else {
+                $this->info('Permission already exists: ' . $permission);
+            }
+        }
+
+        // Attempt to assign these permissions to a 'super-admin' role if it exists
+        try {
+            $superAdminRole = \Spatie\Permission\Models\Role::where('name', 'super-admin')->first();
+            if ($superAdminRole) {
+                $superAdminRole->givePermissionTo($permissions);
+                $this->info('Permissions assigned to super-admin role.');
+            }
+        } catch (\Exception $e) {
+            $this->warn('Could not assign permissions to roles: ' . $e->getMessage());
+        }
+    }
 
 }

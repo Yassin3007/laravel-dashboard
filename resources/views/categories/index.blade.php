@@ -5,14 +5,14 @@
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="content-header-left col-md-6 col-xs-12 mb-1">
-                    <h2 class="content-header-title">{{modelNamePlural}} Management</h2>
+                    <h2 class="content-header-title">Categories Management</h2>
                 </div>
                 <div class="content-header-right breadcrumbs-right breadcrumbs-top col-md-6 col-xs-12">
                     <div class="breadcrumb-wrapper col-xs-12">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a>
+                            <li class="breadcrumb-item"><a href="{{ route(\'dashboard\') }}">Dashboard</a>
                             </li>
-                            <li class="breadcrumb-item active">{{modelNamePlural}}
+                            <li class="breadcrumb-item active">Categories
                             </li>
                         </ol>
                     </div>
@@ -24,7 +24,7 @@
                     <div class="col-xs-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">{{modelNamePlural}} List</h4>
+                                <h4 class="card-title">Categories List</h4>
                                 <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
                                 <div class="heading-elements">
                                     <ul class="list-inline mb-0">
@@ -37,9 +37,9 @@
                             </div>
                             <div class="card-body collapse in">
                                 <div class="card-block card-dashboard">
-                                    @can('create_{{modelNameSingularLowerCase}}')
-                                    <a href="{{ route('{{viewPath}}.create') }}" class="btn btn-primary mb-1">
-                                        <i class="icon-plus2"></i> Add New {{modelName}}
+                                    @can('create_category')
+                                    <a href="{{ route(\'categories.create\') }}" class="btn btn-primary mb-1">
+                                        <i class="icon-plus2"></i> Add New Category
                                     </a>
                                     @endcan
                                 </div>
@@ -48,33 +48,35 @@
                                         <thead class="thead-inverse">
                                         <tr>
                                             <th>#</th>
-                                            {{tableHeaders}}
+                                            <th>Title</th>
+                <th>Content</th>
                                             <th>Actions</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        @forelse(${{modelNamePluralLowerCase}} as ${{modelNameSingularLowerCase}})
+                                        @forelse($categories as $category)
                                             <tr>
                                                 <th scope="row">{{ $loop->iteration }}</th>
-                                                {{tableRows}}
+                                                <td>{{ $category->title }}</td>
+                <td>{{ $category->content }}</td>
                                                 <td>
-                                                    @can('view_{{modelNameSingularLowerCase}}')
-                                                    <a href="{{ route('{{viewPath}}.show', ${{modelNameSingularLowerCase}}->id) }}" class="btn btn-info btn-sm">
+                                                    @can('view_category')
+                                                    <a href="{{ route(\'categories.show\', $category->id) }}" class="btn btn-info btn-sm">
                                                         <i class="icon-eye6"></i> View
                                                     </a>
                                                     @endcan
 
-                                                    @can('edit_{{modelNameSingularLowerCase}}')
-                                                    <a href="{{ route('{{viewPath}}.edit', ${{modelNameSingularLowerCase}}->id) }}" class="btn btn-warning btn-sm">
+                                                    @can('edit_category')
+                                                    <a href="{{ route(\'categories.edit\', $category->id) }}" class="btn btn-warning btn-sm">
                                                         <i class="icon-pencil3"></i> Edit
                                                     </a>
                                                     @endcan
 
-                                                    @can('delete_{{modelNameSingularLowerCase}}')
-                                                    <form action="{{ route('{{viewPath}}.destroy', ${{modelNameSingularLowerCase}}->id) }}" method="POST" style="display: inline-block;">
+                                                    @can('delete_category')
+                                                    <form action="{{ route(\'categories.destroy\', $category->id) }}" method="POST" style="display: inline-block;">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this {{modelName}}?');">
+                                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to delete this Category?\');">
                                                             <i class="icon-trash4"></i> Delete
                                                         </button>
                                                     </form>
@@ -83,7 +85,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="{{ 2 + count(Schema::getColumnListing('{{viewPath}}')) }}" class="text-center">No {{modelNamePlural}} found.</td>
+                                                <td colspan="{{ 2 + count(Schema::getColumnListing('categories')) }}" class="text-center">No Categories found.</td>
                                             </tr>
                                         @endforelse
                                         </tbody>

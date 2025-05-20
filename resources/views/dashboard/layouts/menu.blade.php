@@ -9,3 +9,28 @@
 <li class=" nav-item"><a href="changelog.html"><i class="icon-copy"></i><span data-i18n="nav.changelog.main" class="menu-title">Dashboard</span><span class="tag tag tag-pill tag-danger float-xs-right">1.0</span></a>
 </li>
 
+@can('view_role')
+<li class=" nav-item"><a href="{{ route('roles.index') }}"><i class="icon-list"></i><span data-i18n="nav.roles.main" class="menu-title">Roles</span></a>
+</li>
+@endcan
+
+@can('view_permission')
+<li class=" nav-item"><a href="{{ route('permissions.index') }}"><i class="icon-list"></i><span data-i18n="nav.permissions.main" class="menu-title">Permissions</span></a>
+</li>
+
+@can('view_yassin')
+<li class=" nav-item"><a href="{{ route('yassins.index') }}"><i class="icon-list"></i><span data-i18n="nav.yassins.main" class="menu-title">Yassins</span></a>
+</li>
+
+@can('view_ahmed')
+<li class=" nav-item"><a href="{{ route('ahmeds.index') }}"><i class="icon-list"></i><span data-i18n="nav.ahmeds.main" class="menu-title">Ahmeds</span></a>
+</li>
+
+@can('view_mohamed')
+<li class=" nav-item"><a href="{{ route('mohameds.index') }}"><i class="icon-list"></i><span data-i18n="nav.mohameds.main" class="menu-title">Mohameds</span></a>
+</li>
+@endcan
+@endcan
+@endcan
+@endcan
+
