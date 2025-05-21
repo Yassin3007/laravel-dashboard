@@ -154,6 +154,7 @@
         $(document).ready(function() {
             // Select All functionality
             $('#select_all').on('change', function() {
+                console.log('test')
                 $('.permission-checkbox').prop('checked', $(this).is(':checked'));
             });
 

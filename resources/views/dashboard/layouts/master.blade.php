@@ -200,6 +200,7 @@
 {{--    </footer>--}}
 
     <!-- BEGIN VENDOR JS-->
+
     <script src="{{ asset('dashboard/app-assets/js/core/libraries/jquery.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('dashboard/app-assets/vendors/js/ui/tether.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('dashboard/app-assets/js/core/libraries/bootstrap.min.js') }}" type="text/javascript"></script>
@@ -214,6 +215,8 @@
     <!-- BEGIN ROBUST JS-->
     <script src="{{ asset('dashboard/app-assets/js/core/app-menu.js') }}" type="text/javascript"></script>
     <script src="{{ asset('dashboard/app-assets/js/core/app.js') }}" type="text/javascript"></script>
+
+    @yield('page_scripts')
     <!-- END ROBUST JS-->
   </body>
 </html>
