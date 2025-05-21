@@ -57,19 +57,19 @@ Route::middleware(['auth'])->group(function() {
         ->name('roles.store')
         ->middleware('can:create_role');
 
-    Route::get('roles/role', [RoleController::class, 'show'])
+    Route::get('roles/{role}', [RoleController::class, 'show'])
         ->name('roles.show')
         ->middleware('can:view_role');
 
-    Route::get('roles/role/edit', [RoleController::class, 'edit'])
+    Route::get('roles/{role}/edit', [RoleController::class, 'edit'])
         ->name('roles.edit')
         ->middleware('can:edit_role');
 
-    Route::put('roles/role', [RoleController::class, 'update'])
+    Route::put('roles/{role}', [RoleController::class, 'update'])
         ->name('roles.update')
         ->middleware('can:edit_role');
 
-    Route::delete('roles/role', [RoleController::class, 'destroy'])
+    Route::delete('roles/{role}', [RoleController::class, 'destroy'])
         ->name('roles.destroy')
         ->middleware('can:delete_role');
 });
@@ -88,19 +88,19 @@ Route::middleware(['auth'])->group(function() {
         ->name('permissions.store')
         ->middleware('can:create_permission');
 
-    Route::get('permissions/permission', [PermissionController::class, 'show'])
+    Route::get('permissions/{permission}', [PermissionController::class, 'show'])
         ->name('permissions.show')
         ->middleware('can:view_permission');
 
-    Route::get('permissions/permission/edit', [PermissionController::class, 'edit'])
+    Route::get('permissions/{permission}/edit', [PermissionController::class, 'edit'])
         ->name('permissions.edit')
         ->middleware('can:edit_permission');
 
-    Route::put('permissions/permission', [PermissionController::class, 'update'])
+    Route::put('permissions/{permission}', [PermissionController::class, 'update'])
         ->name('permissions.update')
         ->middleware('can:edit_permission');
 
-    Route::delete('permissions/permission', [PermissionController::class, 'destroy'])
+    Route::delete('permissions/{permission}', [PermissionController::class, 'destroy'])
         ->name('permissions.destroy')
         ->middleware('can:delete_permission');
 });

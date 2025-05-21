@@ -18,19 +18,5 @@
 <li class=" nav-item"><a href="{{ route('permissions.index') }}"><i class="icon-list"></i><span data-i18n="nav.permissions.main" class="menu-title">Permissions</span></a>
 </li>
 
-@can('view_yassin')
-<li class=" nav-item"><a href="{{ route('yassins.index') }}"><i class="icon-list"></i><span data-i18n="nav.yassins.main" class="menu-title">Yassins</span></a>
-</li>
-
-@can('view_ahmed')
-<li class=" nav-item"><a href="{{ route('ahmeds.index') }}"><i class="icon-list"></i><span data-i18n="nav.ahmeds.main" class="menu-title">Ahmeds</span></a>
-</li>
-
-@can('view_mohamed')
-<li class=" nav-item"><a href="{{ route('mohameds.index') }}"><i class="icon-list"></i><span data-i18n="nav.mohameds.main" class="menu-title">Mohameds</span></a>
-</li>
-@endcan
-@endcan
-@endcan
 @endcan
 
