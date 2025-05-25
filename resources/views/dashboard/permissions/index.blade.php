@@ -90,11 +90,15 @@
                                         @endforelse
                                         </tbody>
                                     </table>
+
                                 </div>
+
                             </div>
+
                         </div>
                     </div>
                 </div>
+
                 <!-- Table head options end -->
             </div>
         </div>

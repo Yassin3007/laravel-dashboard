@@ -17,6 +17,5 @@
 @can('view_permission')
 <li class=" nav-item"><a href="{{ route('permissions.index') }}"><i class="icon-list"></i><span data-i18n="nav.permissions.main" class="menu-title">Permissions</span></a>
 </li>
-
 @endcan
 

@@ -287,8 +287,36 @@ class CrudGeneratorCommand extends Command
 
         // Save controller file
         File::put(app_path('Http/Controllers/Dashboard/' . $modelName . 'Controller.php'), $controllerTemplate);
+
+        // Create the service class
+        $this->createService($modelName);
     }
 
+    /**
+     * Create the service class.
+     *
+     * @param string $modelName
+     * @return void
+     */
+    protected function createService($modelName)
+    {
+        $this->info('Creating Service: ' . $modelName . 'Service');
+
+        $serviceTemplate = File::get(app_path('Console/Commands/stubs/service.stub'));
+
+        // Replace placeholders
+        $serviceTemplate = str_replace('{{modelName}}', $modelName, $serviceTemplate);
+        $serviceTemplate = str_replace('{{modelNameSingularLowerCase}}', Str::camel($modelName), $serviceTemplate);
+        $serviceTemplate = str_replace('{{modelNamePluralLowerCase}}', Str::camel(Str::plural($modelName)), $serviceTemplate);
+
+        // Create directories if needed
+        if (!File::exists(app_path('Services'))) {
+            File::makeDirectory(app_path('Services'), 0755, true);
+        }
+
+        // Save service file
+        File::put(app_path('Services/' . $modelName . 'Service.php'), $serviceTemplate);
+    }
     /**
      * Create the views.
      *
@@ -505,19 +533,19 @@ Route::middleware(['auth'])->group(function() {
         ->name('$routeName.store')
         ->middleware('can:create_$modelNameLower');
 
-    Route::get('$routeName/{$modelNameCamel}', [$controllerClass::class, 'show'])
+    Route::get('$routeName/{{$modelNameCamel}}', [$controllerClass::class, 'show'])
         ->name('$routeName.show')
         ->middleware('can:view_$modelNameLower');
 
-    Route::get('$routeName/{$modelNameCamel}/edit', [$controllerClass::class, 'edit'])
+    Route::get('$routeName/{{$modelNameCamel}}/edit', [$controllerClass::class, 'edit'])
         ->name('$routeName.edit')
         ->middleware('can:edit_$modelNameLower');
 
-    Route::put('$routeName/{$modelNameCamel}', [$controllerClass::class, 'update'])
+    Route::put('$routeName/{{$modelNameCamel}}', [$controllerClass::class, 'update'])
         ->name('$routeName.update')
         ->middleware('can:edit_$modelNameLower');
 
-    Route::delete('$routeName/{$modelNameCamel}', [$controllerClass::class, 'destroy'])
+    Route::delete('$routeName/{{$modelNameCamel}}', [$controllerClass::class, 'destroy'])
         ->name('$routeName.destroy')
         ->middleware('can:delete_$modelNameLower');
 });";
@@ -617,7 +645,7 @@ Route::middleware(['auth'])->group(function() {
 @endcan";
 
         // Find a good place to insert the new menu item - after the last </li> tag
-        $lastPos = strrpos($sidebarContent, '</li>');
+        $lastPos = strrpos($sidebarContent, '</li>@endcan');
         if ($lastPos !== false) {
             // Insert after the last </li> tag
             $sidebarContent = substr_replace($sidebarContent, "\n$sidebarItem", $lastPos + 5, 0);

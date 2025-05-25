@@ -3,9 +3,8 @@
 use App\Http\Controllers\Dashboard\PermissionController;
 use App\Http\Controllers\Dashboard\RoleController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\YassinController;
-use App\Http\Controllers\Dashboard\AhmedController;
-use App\Http\Controllers\Dashboard\MohamedController;
+use App\Http\Controllers\Dashboard\PostController;
+
 
 Route::get('/dashboard2', function () {
 
@@ -106,95 +105,160 @@ Route::middleware(['auth'])->group(function() {
 });
 
 
-// Routes for Yassin
+
+
+
+// Routes for Post
 Route::middleware(['auth'])->group(function() {
-    Route::get('yassins', [YassinController::class, 'index'])
-        ->name('yassins.index')
-        ->middleware('can:view_yassin');
+    Route::get('posts', [PostController::class, 'index'])
+        ->name('posts.index')
+        ->middleware('can:view_post');
 
-    Route::get('yassins/create', [YassinController::class, 'create'])
-        ->name('yassins.create')
-        ->middleware('can:create_yassin');
+    Route::get('posts/create', [PostController::class, 'create'])
+        ->name('posts.create')
+        ->middleware('can:create_post');
 
-    Route::post('yassins', [YassinController::class, 'store'])
-        ->name('yassins.store')
-        ->middleware('can:create_yassin');
+    Route::post('posts', [PostController::class, 'store'])
+        ->name('posts.store')
+        ->middleware('can:create_post');
 
-    Route::get('yassins/yassin', [YassinController::class, 'show'])
-        ->name('yassins.show')
-        ->middleware('can:view_yassin');
+    Route::get('posts/{post}', [PostController::class, 'show'])
+        ->name('posts.show')
+        ->middleware('can:view_post');
 
-    Route::get('yassins/yassin/edit', [YassinController::class, 'edit'])
-        ->name('yassins.edit')
-        ->middleware('can:edit_yassin');
+    Route::get('posts/{post}/edit', [PostController::class, 'edit'])
+        ->name('posts.edit')
+        ->middleware('can:edit_post');
 
-    Route::put('yassins/yassin', [YassinController::class, 'update'])
-        ->name('yassins.update')
-        ->middleware('can:edit_yassin');
+    Route::put('posts/{post}', [PostController::class, 'update'])
+        ->name('posts.update')
+        ->middleware('can:edit_post');
 
-    Route::delete('yassins/yassin', [YassinController::class, 'destroy'])
-        ->name('yassins.destroy')
-        ->middleware('can:delete_yassin');
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])
+        ->name('posts.destroy')
+        ->middleware('can:delete_post');
 });
 
-// Routes for Ahmed
+// Routes for Post
 Route::middleware(['auth'])->group(function() {
-    Route::get('ahmeds', [AhmedController::class, 'index'])
-        ->name('ahmeds.index')
-        ->middleware('can:view_ahmed');
+    Route::get('posts', [PostController::class, 'index'])
+        ->name('posts.index')
+        ->middleware('can:view_post');
 
-    Route::get('ahmeds/create', [AhmedController::class, 'create'])
-        ->name('ahmeds.create')
-        ->middleware('can:create_ahmed');
+    Route::get('posts/create', [PostController::class, 'create'])
+        ->name('posts.create')
+        ->middleware('can:create_post');
 
-    Route::post('ahmeds', [AhmedController::class, 'store'])
-        ->name('ahmeds.store')
-        ->middleware('can:create_ahmed');
+    Route::post('posts', [PostController::class, 'store'])
+        ->name('posts.store')
+        ->middleware('can:create_post');
 
-    Route::get('ahmeds/ahmed', [AhmedController::class, 'show'])
-        ->name('ahmeds.show')
-        ->middleware('can:view_ahmed');
+    Route::get('posts/{post}', [PostController::class, 'show'])
+        ->name('posts.show')
+        ->middleware('can:view_post');
 
-    Route::get('ahmeds/ahmed/edit', [AhmedController::class, 'edit'])
-        ->name('ahmeds.edit')
-        ->middleware('can:edit_ahmed');
+    Route::get('posts/{post}/edit', [PostController::class, 'edit'])
+        ->name('posts.edit')
+        ->middleware('can:edit_post');
 
-    Route::put('ahmeds/ahmed', [AhmedController::class, 'update'])
-        ->name('ahmeds.update')
-        ->middleware('can:edit_ahmed');
+    Route::put('posts/{post}', [PostController::class, 'update'])
+        ->name('posts.update')
+        ->middleware('can:edit_post');
 
-    Route::delete('ahmeds/ahmed', [AhmedController::class, 'destroy'])
-        ->name('ahmeds.destroy')
-        ->middleware('can:delete_ahmed');
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])
+        ->name('posts.destroy')
+        ->middleware('can:delete_post');
 });
 
-// Routes for Mohamed
+// Routes for Post
 Route::middleware(['auth'])->group(function() {
-    Route::get('mohameds', [MohamedController::class, 'index'])
-        ->name('mohameds.index')
-        ->middleware('can:view_mohamed');
+    Route::get('posts', [PostController::class, 'index'])
+        ->name('posts.index')
+        ->middleware('can:view_post');
 
-    Route::get('mohameds/create', [MohamedController::class, 'create'])
-        ->name('mohameds.create')
-        ->middleware('can:create_mohamed');
+    Route::get('posts/create', [PostController::class, 'create'])
+        ->name('posts.create')
+        ->middleware('can:create_post');
 
-    Route::post('mohameds', [MohamedController::class, 'store'])
-        ->name('mohameds.store')
-        ->middleware('can:create_mohamed');
+    Route::post('posts', [PostController::class, 'store'])
+        ->name('posts.store')
+        ->middleware('can:create_post');
 
-    Route::get('mohameds/mohamed', [MohamedController::class, 'show'])
-        ->name('mohameds.show')
-        ->middleware('can:view_mohamed');
+    Route::get('posts/{post}', [PostController::class, 'show'])
+        ->name('posts.show')
+        ->middleware('can:view_post');
 
-    Route::get('mohameds/mohamed/edit', [MohamedController::class, 'edit'])
-        ->name('mohameds.edit')
-        ->middleware('can:edit_mohamed');
+    Route::get('posts/{post}/edit', [PostController::class, 'edit'])
+        ->name('posts.edit')
+        ->middleware('can:edit_post');
 
-    Route::put('mohameds/mohamed', [MohamedController::class, 'update'])
-        ->name('mohameds.update')
-        ->middleware('can:edit_mohamed');
+    Route::put('posts/{post}', [PostController::class, 'update'])
+        ->name('posts.update')
+        ->middleware('can:edit_post');
 
-    Route::delete('mohameds/mohamed', [MohamedController::class, 'destroy'])
-        ->name('mohameds.destroy')
-        ->middleware('can:delete_mohamed');
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])
+        ->name('posts.destroy')
+        ->middleware('can:delete_post');
+});
+
+// Routes for Post
+Route::middleware(['auth'])->group(function() {
+    Route::get('posts', [PostController::class, 'index'])
+        ->name('posts.index')
+        ->middleware('can:view_post');
+
+    Route::get('posts/create', [PostController::class, 'create'])
+        ->name('posts.create')
+        ->middleware('can:create_post');
+
+    Route::post('posts', [PostController::class, 'store'])
+        ->name('posts.store')
+        ->middleware('can:create_post');
+
+    Route::get('posts/{post}', [PostController::class, 'show'])
+        ->name('posts.show')
+        ->middleware('can:view_post');
+
+    Route::get('posts/{post}/edit', [PostController::class, 'edit'])
+        ->name('posts.edit')
+        ->middleware('can:edit_post');
+
+    Route::put('posts/{post}', [PostController::class, 'update'])
+        ->name('posts.update')
+        ->middleware('can:edit_post');
+
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])
+        ->name('posts.destroy')
+        ->middleware('can:delete_post');
+});
+
+// Routes for Post
+Route::middleware(['auth'])->group(function() {
+    Route::get('posts', [PostController::class, 'index'])
+        ->name('posts.index')
+        ->middleware('can:view_post');
+
+    Route::get('posts/create', [PostController::class, 'create'])
+        ->name('posts.create')
+        ->middleware('can:create_post');
+
+    Route::post('posts', [PostController::class, 'store'])
+        ->name('posts.store')
+        ->middleware('can:create_post');
+
+    Route::get('posts/{post}', [PostController::class, 'show'])
+        ->name('posts.show')
+        ->middleware('can:view_post');
+
+    Route::get('posts/{post}/edit', [PostController::class, 'edit'])
+        ->name('posts.edit')
+        ->middleware('can:edit_post');
+
+    Route::put('posts/{post}', [PostController::class, 'update'])
+        ->name('posts.update')
+        ->middleware('can:edit_post');
+
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])
+        ->name('posts.destroy')
+        ->middleware('can:delete_post');
 });

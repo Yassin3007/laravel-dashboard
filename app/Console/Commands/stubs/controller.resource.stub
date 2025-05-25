@@ -2,97 +2,252 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Models\{{modelName}};
-use App\Http\Requests\{{modelName}}Request;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\{{modelName}}Request;
+use App\Services\{{modelName}}Service;
+use App\Models\{{modelName}};
+use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
 
 class {{modelName}}Controller extends Controller
 {
+    protected {{modelName}}Service ${{modelNameSingularLowerCase}}Service;
+
+    public function __construct({{modelName}}Service ${{modelNameSingularLowerCase}}Service)
+    {
+        $this->{{modelNameSingularLowerCase}}Service = ${{modelNameSingularLowerCase}}Service;
+    }
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return View|JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        ${{modelNamePluralLowerCase}} = {{modelName}}::latest()->paginate(10);
+        ${{modelNamePluralLowerCase}} = $this->{{modelNameSingularLowerCase}}Service->getAllPaginated($request->get('per_page', 15));
 
-        return view('{{viewPath}}.index', compact('{{modelNamePluralLowerCase}}'));
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => ${{modelNamePluralLowerCase}},
+                'message' => '{{modelNamePlural}} retrieved successfully.'
+            ]);
+        }
+
+        return view('dashboard.{{viewPath}}.index', compact('{{modelNamePluralLowerCase}}'));
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return View|JsonResponse
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('{{viewPath}}.create');
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Ready to create new {{modelName}}.'
+            ]);
+        }
+
+        return view('dashboard.{{viewPath}}.create');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\{{modelName}}Request  $request
-     * @return \Illuminate\Http\Response
+     * @param {{modelName}}Request $request
+     * @return RedirectResponse|JsonResponse
      */
     public function store({{modelName}}Request $request)
     {
-        ${{modelNameSingularLowerCase}} = {{modelName}}::create($request->validated());
+        try {
+            ${{modelNameSingularLowerCase}} = $this->{{modelNameSingularLowerCase}}Service->create($request->validated());
 
-        return redirect()->route('{{viewPath}}.index')
-            ->with('success', '{{modelName}} created successfully.');
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'data' => ${{modelNameSingularLowerCase}},
+                    'message' => '{{modelName}} created successfully.'
+                ], 201);
+            }
+
+            return redirect()->route('{{viewPath}}.index')
+                ->with('success', '{{modelName}} created successfully.');
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error creating {{modelName}}: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error creating {{modelName}}: ' . $e->getMessage());
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\{{modelName}}  ${{modelNameSingularLowerCase}}
-     * @return \Illuminate\Http\Response
+     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @param Request $request
+     * @return View|JsonResponse
      */
-    public function show({{modelName}} ${{modelNameSingularLowerCase}})
+    public function show({{modelName}} ${{modelNameSingularLowerCase}}, Request $request)
     {
-        return view('{{viewPath}}.show', compact('{{modelNameSingularLowerCase}}'));
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => ${{modelNameSingularLowerCase}},
+                'message' => '{{modelName}} retrieved successfully.'
+            ]);
+        }
+
+        return view('dashboard.{{viewPath}}.show', compact('{{modelNameSingularLowerCase}}'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\{{modelName}}  ${{modelNameSingularLowerCase}}
-     * @return \Illuminate\Http\Response
+     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @param Request $request
+     * @return View|JsonResponse
      */
-    public function edit({{modelName}} ${{modelNameSingularLowerCase}})
+    public function edit({{modelName}} ${{modelNameSingularLowerCase}}, Request $request)
     {
-        return view('{{viewPath}}.edit', compact('{{modelNameSingularLowerCase}}'));
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => ${{modelNameSingularLowerCase}},
+                'message' => '{{modelName}} ready for editing.'
+            ]);
+        }
+
+        return view('dashboard.{{viewPath}}.edit', compact('{{modelNameSingularLowerCase}}'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\{{modelName}}Request  $request
-     * @param  \App\Models\{{modelName}}  ${{modelNameSingularLowerCase}}
-     * @return \Illuminate\Http\Response
+     * @param {{modelName}}Request $request
+     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @return RedirectResponse|JsonResponse
      */
     public function update({{modelName}}Request $request, {{modelName}} ${{modelNameSingularLowerCase}})
     {
-        ${{modelNameSingularLowerCase}}->update($request->validated());
+        try {
+            $updated{{modelName}} = $this->{{modelNameSingularLowerCase}}Service->update(${{modelNameSingularLowerCase}}, $request->validated());
 
-        return redirect()->route('{{viewPath}}.index')
-            ->with('success', '{{modelName}} updated successfully.');
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $updated{{modelName}},
+                    'message' => '{{modelName}} updated successfully.'
+                ]);
+            }
+
+            return redirect()->route('{{viewPath}}.index')
+                ->with('success', '{{modelName}} updated successfully.');
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error updating {{modelName}}: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error updating {{modelName}}: ' . $e->getMessage());
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\{{modelName}}  ${{modelNameSingularLowerCase}}
-     * @return \Illuminate\Http\Response
+     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @param Request $request
+     * @return RedirectResponse|JsonResponse
      */
-    public function destroy({{modelName}} ${{modelNameSingularLowerCase}})
+    public function destroy({{modelName}} ${{modelNameSingularLowerCase}}, Request $request)
     {
-        ${{modelNameSingularLowerCase}}->delete();
+        try {
+            $this->{{modelNameSingularLowerCase}}Service->delete(${{modelNameSingularLowerCase}});
 
-        return redirect()->route('{{viewPath}}.index')
-            ->with('success', '{{modelName}} deleted successfully.');
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => '{{modelName}} deleted successfully.'
+                ]);
+            }
+
+            return redirect()->route('{{viewPath}}.index')
+                ->with('success', '{{modelName}} deleted successfully.');
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting {{modelName}}: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->with('error', 'Error deleting {{modelName}}: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get filtered/searched results
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function search(Request $request): JsonResponse
+    {
+        try {
+            $results = $this->{{modelNameSingularLowerCase}}Service->search($request->all());
+
+            return response()->json([
+                'success' => true,
+                'data' => $results,
+                'message' => 'Search completed successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Search error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Bulk delete resources
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulkDelete(Request $request): JsonResponse
+    {
+        try {
+            $ids = $request->input('ids', []);
+            $deleted = $this->{{modelNameSingularLowerCase}}Service->bulkDelete($ids);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully deleted {$deleted} {{modelNamePluralLowerCase}}."
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bulk delete error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
