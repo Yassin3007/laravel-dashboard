@@ -245,7 +245,7 @@
                                                                 <div class="media">
                                                                     <div class="media-left">
                                                                         <div class="avatar avatar-sm">
-                                                                            <img src="/api/placeholder/40/40" alt="Avatar" class="media-object rounded-circle">
+                                                                            <img src="{{ $user->image_url }}" alt="Avatar" class="media-object rounded-circle">
                                                                         </div>
                                                                     </div>
                                                                     <div class="media-body media-middle">

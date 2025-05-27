@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Dashboard\PermissionController;
+use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\RoleController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Dashboard\PostController;
 
 
 Route::get('/dashboard2', function () {
@@ -18,7 +20,7 @@ Route::post('/register', [App\Http\Controllers\AuthController::class, 'register'
 Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout')->middleware('auth');
-
+Route::get('/language/{locale}', [\App\Http\Controllers\HomeController::class, 'switchLanguage'])->name('language.switch');
 // Profile Routes
 Route::get('/profile', [App\Http\Controllers\AuthController::class, 'profile'])->name('profile')->middleware('auth');
 Route::put('/profile', [App\Http\Controllers\AuthController::class, 'updateProfile'])->name('profile.update')->middleware('auth');
@@ -29,7 +31,24 @@ Route::get('/reset-password', [App\Http\Controllers\AuthController::class, 'show
 
 
 
+// Profile routes (protected by auth middleware)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard2', function () {
 
+        return view('dashboard.temp.index');
+    })->name('dashboard');
+    // Profile edit page
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+
+    // Update profile
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Delete profile image
+    Route::delete('/profile/delete-image', [ProfileController::class, 'deleteImage'])->name('profile.delete-image');
+
+    // Logout route
+    Route::post('/logout', [ProfileController::class, 'logout'])->name('logout');
+});
 
 
 
@@ -106,3 +125,5 @@ Route::middleware(['auth'])->group(function() {
 
 
 
+
+;

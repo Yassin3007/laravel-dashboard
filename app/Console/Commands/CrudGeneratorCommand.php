@@ -325,146 +325,147 @@ class CrudGeneratorCommand extends Command
      * @param array $fields
      * @return void
      */
-    protected function createViews($modelName, $tableName, $fields)
-    {
-        $this->info('Creating Views for: ' . $modelName);
+//    protected function createViews($modelName, $tableName, $fields)
+//    {
+//        $this->info('Creating Views for: ' . $modelName);
+//
+//        $viewPath = resource_path('views/dashboard/' . Str::kebab(Str::plural($modelName)));
+//
+//        if (!File::exists($viewPath)) {
+//            File::makeDirectory($viewPath, 0755, true);
+//        }
+//
+//        // Get column information from database if table exists
+//        $databaseColumns = [];
+//        try {
+//            if (Schema::hasTable($tableName)) {
+//                $databaseColumns = Schema::getColumnListing($tableName);
+//            }
+//        } catch (\Exception $e) {
+//            $this->warn('Could not fetch table schema: ' . $e->getMessage());
+//        }
+//
+//        // Merge manually provided fields with database columns
+//        $columns = !empty($fields) ? $fields : $databaseColumns;
+//
+//        // Define form fields based on column types
+//        $formFields = [];
+//        $tableHeaders = [];
+//        $tableRows = [];
+//
+//        foreach ($columns as $column) {
+//            // Skip id, timestamps, and created_at/updated_at fields in forms
+//            if (in_array($column, ['id', 'created_at', 'updated_at'])) {
+//                continue;
+//            }
+//
+//            // Parse field name and type
+//            if (strpos($column, ':') !== false) {
+//                list($column, $type) = explode(':', $column);
+//            } else {
+//                // Try to get type from DB if available
+//                $type = 'string'; // Default type
+//                if (!empty($databaseColumns)) {
+//                    try {
+//                        $columnType = DB::getSchemaBuilder()->getColumnType($tableName, $column);
+//                        switch ($columnType) {
+//                            case 'boolean':
+//                                $type = 'boolean';
+//                                break;
+//                            case 'integer':
+//                            case 'bigint':
+//                                $type = 'integer';
+//                                break;
+//                            case 'datetime':
+//                                $type = 'datetime';
+//                                break;
+//                            case 'date':
+//                                $type = 'date';
+//                                break;
+//                            case 'text':
+//                            case 'longtext':
+//                                $type = 'text';
+//                                break;
+//                            case 'decimal':
+//                            case 'float':
+//                                $type = 'decimal';
+//                                break;
+//                            default:
+//                                $type = 'string';
+//                        }
+//                    } catch (\Exception $e) {
+//                        $this->warn('Could not determine column type: ' . $e->getMessage());
+//                    }
+//                }
+//            }
+//
+//            $column = trim($column);
+//            $type = trim($type);
+//
+//            // Generate form field based on type
+//            $formFields[] = $this->generateFormField($column, $type, $modelName);
+//
+//            // Generate table header
+//            $tableHeaders[] = '<th>' . Str::title(str_replace('_', ' ', $column)) . '</th>';
+//
+//            // Generate table row cell
+//            $tableRows[] = $this->generateTableCell($column, $type);
+//        }
+//
+//        // Create index view
+//        $indexTemplate = $this->loadViewTemplate('index');
+//        $indexTemplate = str_replace('{{modelName}}', $modelName, $indexTemplate);
+//        $indexTemplate = str_replace('{{modelNamePlural}}', Str::plural($modelName), $indexTemplate);
+//        $indexTemplate = str_replace('{{modelNamePluralLowerCase}}', Str::camel(Str::plural($modelName)), $indexTemplate);
+//        $indexTemplate = str_replace('{{modelNameSingularLowerCase}}', Str::camel($modelName), $indexTemplate);
+//        $indexTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $indexTemplate);
+//        $indexTemplate = str_replace('{{tableHeaders}}', implode("\n                ", $tableHeaders), $indexTemplate);
+//        $indexTemplate = str_replace('{{tableRows}}', implode("\n                ", $tableRows), $indexTemplate);
+//
+//        File::put($viewPath . '/index.blade.php', $indexTemplate);
+//
+//        // Create create view
+//        $createTemplate = $this->loadViewTemplate('create');
+//        $createTemplate = str_replace('{{modelName}}', $modelName, $createTemplate);
+//        $createTemplate = str_replace('{{modelNameLowerCase}}', Str::camel($modelName), $createTemplate);
+//        $createTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $createTemplate);
+//        $createTemplate = str_replace('{{formFields}}', implode("\n                ", $formFields), $createTemplate);
+//
+//        File::put($viewPath . '/create.blade.php', $createTemplate);
+//
+//        // Create edit view
+//        $editTemplate = $this->loadViewTemplate('edit');
+//        $editTemplate = str_replace('{{modelName}}', $modelName, $editTemplate);
+//        $editTemplate = str_replace('{{modelNameLowerCase}}', Str::camel($modelName), $editTemplate);
+//        $editTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $editTemplate);
+//        $editTemplate = str_replace('{{formFields}}', implode("\n                ", $formFields), $editTemplate);
+//
+//        File::put($viewPath . '/edit.blade.php', $editTemplate);
+//
+//        // Create show view
+//        $showTemplate = $this->loadViewTemplate('show');
+//        $showTemplate = str_replace('{{modelName}}', $modelName, $showTemplate);
+//        $showTemplate = str_replace('{{modelNameLowerCase}}', Str::camel($modelName), $showTemplate);
+//        $showTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $showTemplate);
+//
+//        // Generate detail fields
+//        $detailFields = [];
+//        foreach ($columns as $column) {
+//            if ($column === 'id') continue;
+//
+//            if (strpos($column, ':') !== false) {
+//                list($column, $type) = explode(':', $column);
+//            }
+//
+//            $column = trim($column);
+//            $detailFields[] = $this->generateDetailField($column);
+//        }
+//
+//        $showTemplate = str_replace('{{detailFields}}', implode("\n                ", $detailFields), $showTemplate);
+//
+//        File::put($viewPath . '/show.blade.php', $showTemplate);
+//    }
 
-        $viewPath = resource_path('views/dashboard/' . Str::kebab(Str::plural($modelName)));
-
-        if (!File::exists($viewPath)) {
-            File::makeDirectory($viewPath, 0755, true);
-        }
-
-        // Get column information from database if table exists
-        $databaseColumns = [];
-        try {
-            if (Schema::hasTable($tableName)) {
-                $databaseColumns = Schema::getColumnListing($tableName);
-            }
-        } catch (\Exception $e) {
-            $this->warn('Could not fetch table schema: ' . $e->getMessage());
-        }
-
-        // Merge manually provided fields with database columns
-        $columns = !empty($fields) ? $fields : $databaseColumns;
-
-        // Define form fields based on column types
-        $formFields = [];
-        $tableHeaders = [];
-        $tableRows = [];
-
-        foreach ($columns as $column) {
-            // Skip id, timestamps, and created_at/updated_at fields in forms
-            if (in_array($column, ['id', 'created_at', 'updated_at'])) {
-                continue;
-            }
-
-            // Parse field name and type
-            if (strpos($column, ':') !== false) {
-                list($column, $type) = explode(':', $column);
-            } else {
-                // Try to get type from DB if available
-                $type = 'string'; // Default type
-                if (!empty($databaseColumns)) {
-                    try {
-                        $columnType = DB::getSchemaBuilder()->getColumnType($tableName, $column);
-                        switch ($columnType) {
-                            case 'boolean':
-                                $type = 'boolean';
-                                break;
-                            case 'integer':
-                            case 'bigint':
-                                $type = 'integer';
-                                break;
-                            case 'datetime':
-                                $type = 'datetime';
-                                break;
-                            case 'date':
-                                $type = 'date';
-                                break;
-                            case 'text':
-                            case 'longtext':
-                                $type = 'text';
-                                break;
-                            case 'decimal':
-                            case 'float':
-                                $type = 'decimal';
-                                break;
-                            default:
-                                $type = 'string';
-                        }
-                    } catch (\Exception $e) {
-                        $this->warn('Could not determine column type: ' . $e->getMessage());
-                    }
-                }
-            }
-
-            $column = trim($column);
-            $type = trim($type);
-
-            // Generate form field based on type
-            $formFields[] = $this->generateFormField($column, $type, $modelName);
-
-            // Generate table header
-            $tableHeaders[] = '<th>' . Str::title(str_replace('_', ' ', $column)) . '</th>';
-
-            // Generate table row cell
-            $tableRows[] = $this->generateTableCell($column, $type);
-        }
-
-        // Create index view
-        $indexTemplate = $this->loadViewTemplate('index');
-        $indexTemplate = str_replace('{{modelName}}', $modelName, $indexTemplate);
-        $indexTemplate = str_replace('{{modelNamePlural}}', Str::plural($modelName), $indexTemplate);
-        $indexTemplate = str_replace('{{modelNamePluralLowerCase}}', Str::camel(Str::plural($modelName)), $indexTemplate);
-        $indexTemplate = str_replace('{{modelNameSingularLowerCase}}', Str::camel($modelName), $indexTemplate);
-        $indexTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $indexTemplate);
-        $indexTemplate = str_replace('{{tableHeaders}}', implode("\n                ", $tableHeaders), $indexTemplate);
-        $indexTemplate = str_replace('{{tableRows}}', implode("\n                ", $tableRows), $indexTemplate);
-
-        File::put($viewPath . '/index.blade.php', $indexTemplate);
-
-        // Create create view
-        $createTemplate = $this->loadViewTemplate('create');
-        $createTemplate = str_replace('{{modelName}}', $modelName, $createTemplate);
-        $createTemplate = str_replace('{{modelNameLowerCase}}', Str::camel($modelName), $createTemplate);
-        $createTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $createTemplate);
-        $createTemplate = str_replace('{{formFields}}', implode("\n                ", $formFields), $createTemplate);
-
-        File::put($viewPath . '/create.blade.php', $createTemplate);
-
-        // Create edit view
-        $editTemplate = $this->loadViewTemplate('edit');
-        $editTemplate = str_replace('{{modelName}}', $modelName, $editTemplate);
-        $editTemplate = str_replace('{{modelNameLowerCase}}', Str::camel($modelName), $editTemplate);
-        $editTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $editTemplate);
-        $editTemplate = str_replace('{{formFields}}', implode("\n                ", $formFields), $editTemplate);
-
-        File::put($viewPath . '/edit.blade.php', $editTemplate);
-
-        // Create show view
-        $showTemplate = $this->loadViewTemplate('show');
-        $showTemplate = str_replace('{{modelName}}', $modelName, $showTemplate);
-        $showTemplate = str_replace('{{modelNameLowerCase}}', Str::camel($modelName), $showTemplate);
-        $showTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $showTemplate);
-
-        // Generate detail fields
-        $detailFields = [];
-        foreach ($columns as $column) {
-            if ($column === 'id') continue;
-
-            if (strpos($column, ':') !== false) {
-                list($column, $type) = explode(':', $column);
-            }
-
-            $column = trim($column);
-            $detailFields[] = $this->generateDetailField($column);
-        }
-
-        $showTemplate = str_replace('{{detailFields}}', implode("\n                ", $detailFields), $showTemplate);
-
-        File::put($viewPath . '/show.blade.php', $showTemplate);
-    }
     /**
      * Create the form request class.
      *
@@ -640,7 +641,7 @@ Route::middleware(['auth'])->group(function() {
         // Format for the new menu item with permission check
         $sidebarItem = "
 @can('view_$modelNameLower')
-<li class=\" nav-item\"><a href=\"{{ route('$routeName.index') }}\"><i class=\"icon-list\"></i><span data-i18n=\"nav.$routeName.main\" class=\"menu-title\">$modelNameTitle</span></a>
+<li class=\" nav-item\"><a href=\"{{ route('$routeName.index') }}\"><i class=\"icon-list\"></i><span data-i18n=\"nav.$routeName.main\" class=\"menu-title\">{{__('dashboard.$modelNameLower.title_plural')}}</span></a>
 </li>
 @endcan";
 
@@ -1024,16 +1025,6 @@ Route::middleware(['auth'])->group(function() {
 
 
 
-
-
-
-
-
-
-
-
-
-
     /**
      * Generate form field based on column type.
      *
@@ -1042,123 +1033,123 @@ Route::middleware(['auth'])->group(function() {
      * @param string $modelName
      * @return string
      */
-    protected function generateFormField($column, $type, $modelName)
-    {
-        $label = Str::title(str_replace('_', ' ', $column));
-        $modelVariable = '$' . Str::camel($modelName);
-
-        // Foreign key field (select box)
-        if (Str::endsWith($column, '_id')) {
-            $relatedModel = Str::studly(Str::singular(str_replace('_id', '', $column)));
-            return '<div class="form-group">
-            <label for="' . $column . '">' . $label . '</label>
-            <select id="' . $column . '" name="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
-                <option value="">Select ' . $relatedModel . '</option>
-                @foreach($' . Str::camel(Str::plural($relatedModel)) . ' as $' . Str::camel($relatedModel) . ')
-                    <option value="{{ $' . Str::camel($relatedModel) . '->id }}" {{ isset(' . $modelVariable . ') && ' . $modelVariable . '->' . $column . ' == $' . Str::camel($relatedModel) . '->id ? \'selected\' : \'\' }}>
-                        {{ $' . Str::camel($relatedModel) . '->name }}
-                    </option>
-                @endforeach
-            </select>
-            @error(\'' . $column . '\')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>';
-        }
-
-        // Other field types
-        switch ($type) {
-            case 'boolean':
-                return '<div class="form-group">
-            <label for="' . $column . '">' . $label . '</label>
-            <select id="' . $column . '" name="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
-                <option value="0" {{ isset(' . $modelVariable . ') && !' . $modelVariable . '->' . $column . ' ? \'selected\' : \'\' }}>No</option>
-                <option value="1" {{ isset(' . $modelVariable . ') && ' . $modelVariable . '->' . $column . ' ? \'selected\' : \'\' }}>Yes</option>
-            </select>
-            @error(\'' . $column . '\')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>';
-
-            case 'text':
-                return '<div class="form-group">
-            <label for="' . $column . '">' . $label . '</label>
-            <textarea id="' . $column . '" rows="5" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
-                      name="' . $column . '" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}</textarea>
-            @error(\'' . $column . '\')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>';
-
-            case 'date':
-                return '<div class="form-group">
-            <label for="' . $column . '">' . $label . '</label>
-            <input type="date" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
-                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
-                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
-            @error(\'' . $column . '\')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>';
-
-            case 'datetime':
-                return '<div class="form-group">
-            <label for="' . $column . '">' . $label . '</label>
-            <input type="datetime-local" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
-                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
-                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
-            @error(\'' . $column . '\')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>';
-
-            case 'decimal':
-            case 'float':
-                return '<div class="form-group">
-            <label for="' . $column . '">' . $label . '</label>
-            <input type="number" step="0.01" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
-                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
-                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
-            @error(\'' . $column . '\')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>';
-
-            case 'integer':
-            case 'int':
-            case 'bigint':
-                return '<div class="form-group">
-            <label for="' . $column . '">' . $label . '</label>
-            <input type="number" step="1" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
-                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
-                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
-            @error(\'' . $column . '\')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>';
-
-            case 'json':
-                return '<div class="form-group">
-            <label for="' . $column . '">' . $label . '</label>
-            <textarea id="' . $column . '" rows="5" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
-                      name="' . $column . '" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">{{ isset(' . $modelVariable . ') ? json_encode(' . $modelVariable . '->' . $column . ', JSON_PRETTY_PRINT) : old(\'' . $column . '\') }}</textarea>
-            @error(\'' . $column . '\')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>';
-
-            default:
-                return '<div class="form-group">
-            <label for="' . $column . '">' . $label . '</label>
-            <input type="text" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
-                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
-                   placeholder="' . strtolower($label) . '" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
-            @error(\'' . $column . '\')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>';
-        }
-    }
+//    protected function generateFormField($column, $type, $modelName)
+//    {
+//        $label = Str::title(str_replace('_', ' ', $column));
+//        $modelVariable = '$' . Str::camel($modelName);
+//
+//        // Foreign key field (select box)
+//        if (Str::endsWith($column, '_id')) {
+//            $relatedModel = Str::studly(Str::singular(str_replace('_id', '', $column)));
+//            return '<div class="form-group">
+//            <label for="' . $column . '">' . $label . '</label>
+//            <select id="' . $column . '" name="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
+//                <option value="">Select ' . $relatedModel . '</option>
+//                @foreach($' . Str::camel(Str::plural($relatedModel)) . ' as $' . Str::camel($relatedModel) . ')
+//                    <option value="{{ $' . Str::camel($relatedModel) . '->id }}" {{ isset(' . $modelVariable . ') && ' . $modelVariable . '->' . $column . ' == $' . Str::camel($relatedModel) . '->id ? \'selected\' : \'\' }}>
+//                        {{ $' . Str::camel($relatedModel) . '->name }}
+//                    </option>
+//                @endforeach
+//            </select>
+//            @error(\'' . $column . '\')
+//                <div class="invalid-feedback">{{ $message }}</div>
+//            @enderror
+//        </div>';
+//        }
+//
+//        // Other field types
+//        switch ($type) {
+//            case 'boolean':
+//                return '<div class="form-group">
+//            <label for="' . $column . '">' . $label . '</label>
+//            <select id="' . $column . '" name="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
+//                <option value="0" {{ isset(' . $modelVariable . ') && !' . $modelVariable . '->' . $column . ' ? \'selected\' : \'\' }}>No</option>
+//                <option value="1" {{ isset(' . $modelVariable . ') && ' . $modelVariable . '->' . $column . ' ? \'selected\' : \'\' }}>Yes</option>
+//            </select>
+//            @error(\'' . $column . '\')
+//                <div class="invalid-feedback">{{ $message }}</div>
+//            @enderror
+//        </div>';
+//
+//            case 'text':
+//                return '<div class="form-group">
+//            <label for="' . $column . '">' . $label . '</label>
+//            <textarea id="' . $column . '" rows="5" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+//                      name="' . $column . '" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}</textarea>
+//            @error(\'' . $column . '\')
+//                <div class="invalid-feedback">{{ $message }}</div>
+//            @enderror
+//        </div>';
+//
+//            case 'date':
+//                return '<div class="form-group">
+//            <label for="' . $column . '">' . $label . '</label>
+//            <input type="date" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+//                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+//                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
+//            @error(\'' . $column . '\')
+//                <div class="invalid-feedback">{{ $message }}</div>
+//            @enderror
+//        </div>';
+//
+//            case 'datetime':
+//                return '<div class="form-group">
+//            <label for="' . $column . '">' . $label . '</label>
+//            <input type="datetime-local" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+//                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+//                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
+//            @error(\'' . $column . '\')
+//                <div class="invalid-feedback">{{ $message }}</div>
+//            @enderror
+//        </div>';
+//
+//            case 'decimal':
+//            case 'float':
+//                return '<div class="form-group">
+//            <label for="' . $column . '">' . $label . '</label>
+//            <input type="number" step="0.01" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+//                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+//                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
+//            @error(\'' . $column . '\')
+//                <div class="invalid-feedback">{{ $message }}</div>
+//            @enderror
+//        </div>';
+//
+//            case 'integer':
+//            case 'int':
+//            case 'bigint':
+//                return '<div class="form-group">
+//            <label for="' . $column . '">' . $label . '</label>
+//            <input type="number" step="1" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+//                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+//                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
+//            @error(\'' . $column . '\')
+//                <div class="invalid-feedback">{{ $message }}</div>
+//            @enderror
+//        </div>';
+//
+//            case 'json':
+//                return '<div class="form-group">
+//            <label for="' . $column . '">' . $label . '</label>
+//            <textarea id="' . $column . '" rows="5" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+//                      name="' . $column . '" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">{{ isset(' . $modelVariable . ') ? json_encode(' . $modelVariable . '->' . $column . ', JSON_PRETTY_PRINT) : old(\'' . $column . '\') }}</textarea>
+//            @error(\'' . $column . '\')
+//                <div class="invalid-feedback">{{ $message }}</div>
+//            @enderror
+//        </div>';
+//
+//            default:
+//                return '<div class="form-group">
+//            <label for="' . $column . '">' . $label . '</label>
+//            <input type="text" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+//                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+//                   placeholder="' . strtolower($label) . '" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="' . $label . '">
+//            @error(\'' . $column . '\')
+//                <div class="invalid-feedback">{{ $message }}</div>
+//            @enderror
+//        </div>';
+//        }
+//    }
 
     /**
      * Generate a detail field for the show view.
@@ -1166,14 +1157,14 @@ Route::middleware(['auth'])->group(function() {
      * @param string $column
      * @return string
      */
-    protected function generateDetailField($column)
-    {
-        $label = Str::title(str_replace('_', ' ', $column));
-
-        return '<div class="mb-3">
-        <strong>' . $label . ':</strong> {{ $' . Str::camel($this->argument('name')) . '->' . $column . ' }}
-    </div>';
-    }
+//    protected function generateDetailField($column)
+//    {
+//        $label = Str::title(str_replace('_', ' ', $column));
+//
+//        return '<div class="mb-3">
+//        <strong>' . $label . ':</strong> {{ $' . Str::camel($this->argument('name')) . '->' . $column . ' }}
+//    </div>';
+//    }
 
     /**
      * Generate a table cell for the index view.
@@ -1240,5 +1231,395 @@ Route::middleware(['auth'])->group(function() {
             $this->warn('Could not assign permissions to roles: ' . $e->getMessage());
         }
     }
+
+    protected function updateTranslationFile($modelName, $fields)
+    {
+        $this->info('Updating translation file for: ' . $modelName);
+
+        $translationPath = lang_path('en/dashboard.php');
+
+        // Create translation file if it doesn't exist
+        if (!File::exists(dirname($translationPath))) {
+            File::makeDirectory(dirname($translationPath), 0755, true);
+        }
+
+        if (!File::exists($translationPath)) {
+            File::put($translationPath, "<?php\n\nreturn [\n\n];");
+        }
+
+        // Load existing translations
+        $translations = include $translationPath;
+        if (!is_array($translations)) {
+            $translations = [];
+        }
+
+        $modelNameLower = Str::lower($modelName);
+        $modelNamePlural = Str::lower(Str::plural($modelName));
+        $modelNameTitle = Str::title(str_replace('_', ' ', $modelName));
+        $modelNamePluralTitle = Str::title(str_replace('_', ' ', Str::plural($modelName)));
+
+        // Add model-specific translations
+        $modelTranslations = [
+            $modelNameLower => [
+                'title' => $modelNameTitle,
+                'title_plural' => $modelNamePluralTitle,
+                'management' => $modelNamePluralTitle . ' Management',
+                'list' => $modelNamePluralTitle . ' List',
+                'create' => 'Create ' . $modelNameTitle,
+                'edit' => 'Edit ' . $modelNameTitle,
+                'view' => 'View ' . $modelNameTitle,
+                'delete' => 'Delete ' . $modelNameTitle,
+                'add_new' => 'Add New ' . $modelNameTitle,
+                'create_new' => 'Create New ' . $modelNameTitle,
+                'update' => 'Update ' . $modelNameTitle,
+                'show' => 'Show ' . $modelNameTitle,
+                'actions' => 'Actions',
+                'no_records' => 'No ' . $modelNamePluralTitle . ' found.',
+                'fill_required' => 'Please fill in all required fields to create a new ' . $modelNameTitle . '.',
+                'update_info' => 'Update the information for this ' . $modelNameTitle . '.',
+                'delete_confirm' => 'Are you sure you want to delete this ' . $modelNameTitle . '?',
+
+            ]
+        ];
+
+        // Add field translations
+        foreach ($fields as $field) {
+            $fieldName = trim(explode(':', $field)[0]);
+            if (!in_array($fieldName, ['id', 'created_at', 'updated_at'])) {
+                $fieldLabel = Str::title(str_replace('_', ' ', $fieldName));
+                $modelTranslations[$modelNameLower]['fields'][$fieldName] = $fieldLabel;
+            }
+        }
+
+        // Add common translations if they don't exist
+        if (!isset($translations['common'])) {
+            $translations['common'] = [
+                'dashboard' => 'Dashboard',
+                'save' => 'Save',
+                'update' => 'Update',
+                'cancel' => 'Cancel',
+                'edit' => 'Edit',
+                'delete' => 'Delete',
+                'view' => 'View',
+                'actions' => 'Actions',
+                'yes' => 'Yes',
+                'no' => 'No',
+                'select' => 'Select',
+            ];
+        }
+
+        // Merge translations
+        $translations = array_merge_recursive($translations, $modelTranslations);
+
+        // Write updated translations to file
+        $this->writeTranslationFile($translationPath, $translations);
+    }
+
+    protected function writeTranslationFile($path, $translations)
+    {
+        $content = "<?php\n\nreturn " . $this->arrayToString($translations, 1) . ";";
+        File::put($path, $content);
+    }
+
+    protected function arrayToString($array, $indent = 0)
+    {
+        $indentStr = str_repeat('    ', $indent);
+        $result = "[\n";
+
+        foreach ($array as $key => $value) {
+            $result .= $indentStr . "    '" . $key . "' => ";
+
+            if (is_array($value)) {
+                $result .= $this->arrayToString($value, $indent + 1);
+            } else {
+                $result .= "'" . addslashes($value) . "'";
+            }
+
+            $result .= ",\n";
+        }
+
+        $result .= $indentStr . "]";
+        return $result;
+    }
+
+// Modified createViews function to include translation support
+    protected function createViews($modelName, $tableName, $fields)
+    {
+        $this->info('Creating Views for: ' . $modelName);
+
+        $viewPath = resource_path('views/dashboard/' . Str::kebab(Str::plural($modelName)));
+
+        if (!File::exists($viewPath)) {
+            File::makeDirectory($viewPath, 0755, true);
+        }
+
+        // Get column information from database if table exists
+        $databaseColumns = [];
+        try {
+            if (Schema::hasTable($tableName)) {
+                $databaseColumns = Schema::getColumnListing($tableName);
+            }
+        } catch (\Exception $e) {
+            $this->warn('Could not fetch table schema: ' . $e->getMessage());
+        }
+
+        // Merge manually provided fields with database columns
+        $columns = !empty($fields) ? $fields : $databaseColumns;
+
+        // Define form fields based on column types
+        $formFields = [];
+        $tableHeaders = [];
+        $tableRows = [];
+
+        foreach ($columns as $column) {
+            // Skip id, timestamps, and created_at/updated_at fields in forms
+            if (in_array($column, ['id', 'created_at', 'updated_at'])) {
+                continue;
+            }
+
+            // Parse field name and type
+            if (strpos($column, ':') !== false) {
+                list($column, $type) = explode(':', $column);
+            } else {
+                // Try to get type from DB if available
+                $type = 'string'; // Default type
+                if (!empty($databaseColumns)) {
+                    try {
+                        $columnType = DB::getSchemaBuilder()->getColumnType($tableName, $column);
+                        switch ($columnType) {
+                            case 'boolean':
+                                $type = 'boolean';
+                                break;
+                            case 'integer':
+                            case 'bigint':
+                                $type = 'integer';
+                                break;
+                            case 'datetime':
+                                $type = 'datetime';
+                                break;
+                            case 'date':
+                                $type = 'date';
+                                break;
+                            case 'text':
+                            case 'longtext':
+                                $type = 'text';
+                                break;
+                            case 'decimal':
+                            case 'float':
+                                $type = 'decimal';
+                                break;
+                            default:
+                                $type = 'string';
+                        }
+                    } catch (\Exception $e) {
+                        $this->warn('Could not determine column type: ' . $e->getMessage());
+                    }
+                }
+            }
+
+            $column = trim($column);
+            $type = trim($type);
+
+            // Generate form field based on type
+            $formFields[] = $this->generateFormField($column, $type, $modelName);
+
+            // Generate table header with translation
+            $tableHeaders[] = '<th>{{ __("dashboard.' . Str::lower($modelName) . '.fields.' . $column . '") }}</th>';
+
+            // Generate table row cell
+            $tableRows[] = $this->generateTableCell($column, $type);
+        }
+
+        // Create index view
+        $indexTemplate = $this->loadViewTemplate('index');
+        $indexTemplate = str_replace('{{modelName}}', $modelName, $indexTemplate);
+        $indexTemplate = str_replace('{{modelNamePlural}}', Str::plural($modelName), $indexTemplate);
+        $indexTemplate = str_replace('{{modelNamePluralLowerCase}}', Str::camel(Str::plural($modelName)), $indexTemplate);
+        $indexTemplate = str_replace('{{modelNameSingularLowerCase}}', Str::camel($modelName), $indexTemplate);
+        $indexTemplate = str_replace('{{modelNameLower}}', Str::lower($modelName), $indexTemplate);
+        $indexTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $indexTemplate);
+        $indexTemplate = str_replace('{{tableHeaders}}', implode("\n                ", $tableHeaders), $indexTemplate);
+        $indexTemplate = str_replace('{{tableRows}}', implode("\n                ", $tableRows), $indexTemplate);
+
+        File::put($viewPath . '/index.blade.php', $indexTemplate);
+
+        // Create create view
+        $createTemplate = $this->loadViewTemplate('create');
+        $createTemplate = str_replace('{{modelName}}', $modelName, $createTemplate);
+        $createTemplate = str_replace('{{modelNameLowerCase}}', Str::camel($modelName), $createTemplate);
+        $createTemplate = str_replace('{{modelNameLower}}', Str::lower($modelName), $createTemplate);
+        $createTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $createTemplate);
+        $createTemplate = str_replace('{{formFields}}', implode("\n                ", $formFields), $createTemplate);
+
+        File::put($viewPath . '/create.blade.php', $createTemplate);
+
+        // Create edit view
+        $editTemplate = $this->loadViewTemplate('edit');
+        $editTemplate = str_replace('{{modelName}}', $modelName, $editTemplate);
+        $editTemplate = str_replace('{{modelNameLowerCase}}', Str::camel($modelName), $editTemplate);
+        $editTemplate = str_replace('{{modelNameLower}}', Str::lower($modelName), $editTemplate);
+        $editTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $editTemplate);
+        $editTemplate = str_replace('{{formFields}}', implode("\n                ", $formFields), $editTemplate);
+
+        File::put($viewPath . '/edit.blade.php', $editTemplate);
+
+        // Create show view
+        $showTemplate = $this->loadViewTemplate('show');
+        $showTemplate = str_replace('{{modelName}}', $modelName, $showTemplate);
+        $showTemplate = str_replace('{{modelNameLowerCase}}', Str::camel($modelName), $showTemplate);
+        $showTemplate = str_replace('{{modelNameLower}}', Str::lower($modelName), $showTemplate);
+        $showTemplate = str_replace('{{viewPath}}', Str::kebab(Str::plural($modelName)), $showTemplate);
+
+        // Generate detail fields
+        $detailFields = [];
+        foreach ($columns as $column) {
+            if ($column === 'id') continue;
+
+            if (strpos($column, ':') !== false) {
+                list($column, $type) = explode(':', $column);
+            }
+
+            $column = trim($column);
+            $detailFields[] = $this->generateDetailField($column, $modelName);
+        }
+
+        $showTemplate = str_replace('{{detailFields}}', implode("\n                ", $detailFields), $showTemplate);
+
+        File::put($viewPath . '/show.blade.php', $showTemplate);
+
+        // Update translation file
+        $this->updateTranslationFile($modelName, $fields);
+    }
+
+// Modified generateFormField function with translations
+    protected function generateFormField($column, $type, $modelName)
+    {
+        $modelVariable = '$' . Str::camel($modelName);
+        $modelNameLower = Str::lower($modelName);
+
+        // Foreign key field (select box)
+        if (Str::endsWith($column, '_id')) {
+            $relatedModel = Str::studly(Str::singular(str_replace('_id', '', $column)));
+            return '<div class="form-group">
+            <label for="' . $column . '">{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</label>
+            <select id="' . $column . '" name="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}">
+                <option value="">{{ __("dashboard.common.select") }} {{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</option>
+                @foreach($' . Str::camel(Str::plural($relatedModel)) . ' as $' . Str::camel($relatedModel) . ')
+                    <option value="{{ $' . Str::camel($relatedModel) . '->id }}" {{ isset(' . $modelVariable . ') && ' . $modelVariable . '->' . $column . ' == $' . Str::camel($relatedModel) . '->id ? \'selected\' : \'\' }}>
+                        {{ $' . Str::camel($relatedModel) . '->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error(\'' . $column . '\')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>';
+        }
+
+        // Other field types with translations
+        switch ($type) {
+            case 'boolean':
+                return '<div class="form-group">
+            <label for="' . $column . '">{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</label>
+            <select id="' . $column . '" name="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}">
+                <option value="0" {{ isset(' . $modelVariable . ') && !' . $modelVariable . '->' . $column . ' ? \'selected\' : \'\' }}>{{ __("dashboard.common.no") }}</option>
+                <option value="1" {{ isset(' . $modelVariable . ') && ' . $modelVariable . '->' . $column . ' ? \'selected\' : \'\' }}>{{ __("dashboard.common.yes") }}</option>
+            </select>
+            @error(\'' . $column . '\')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>';
+
+            case 'text':
+                return '<div class="form-group">
+            <label for="' . $column . '">{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</label>
+            <textarea id="' . $column . '" rows="5" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+                      name="' . $column . '" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}">{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}</textarea>
+            @error(\'' . $column . '\')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>';
+
+            case 'date':
+                return '<div class="form-group">
+            <label for="' . $column . '">{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</label>
+            <input type="date" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}">
+            @error(\'' . $column . '\')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>';
+
+            case 'datetime':
+                return '<div class="form-group">
+            <label for="' . $column . '">{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</label>
+            <input type="datetime-local" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}">
+            @error(\'' . $column . '\')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>';
+
+            case 'decimal':
+            case 'float':
+                return '<div class="form-group">
+            <label for="' . $column . '">{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</label>
+            <input type="number" step="0.01" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}">
+            @error(\'' . $column . '\')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>';
+
+            case 'integer':
+            case 'int':
+            case 'bigint':
+                return '<div class="form-group">
+            <label for="' . $column . '">{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</label>
+            <input type="number" step="1" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+                   data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}">
+            @error(\'' . $column . '\')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>';
+
+            case 'json':
+                return '<div class="form-group">
+            <label for="' . $column . '">{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</label>
+            <textarea id="' . $column . '" rows="5" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+                      name="' . $column . '" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}">{{ isset(' . $modelVariable . ') ? json_encode(' . $modelVariable . '->' . $column . ', JSON_PRETTY_PRINT) : old(\'' . $column . '\') }}</textarea>
+            @error(\'' . $column . '\')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>';
+
+            default:
+                return '<div class="form-group">
+            <label for="' . $column . '">{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}</label>
+            <input type="text" id="' . $column . '" class="form-control @error(\'' . $column . '\') is-invalid @enderror"
+                   name="' . $column . '" value="{{ isset(' . $modelVariable . ') ? ' . $modelVariable . '->' . $column . ' : old(\'' . $column . '\') }}"
+                   placeholder="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}" data-toggle="tooltip" data-trigger="hover" data-placement="top" data-title="{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}">
+            @error(\'' . $column . '\')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>';
+        }
+    }
+
+// Modified generateDetailField function with translations
+    protected function generateDetailField($column, $modelName)
+    {
+        $modelNameLower = Str::lower($modelName);
+
+        return '<div class="mb-3">
+        <strong>{{ __("dashboard.' . $modelNameLower . '.fields.' . $column . '") }}:</strong> {{ $' . Str::camel($modelName) . '->' . $column . ' }}
+    </div>';
+    }
+
+// Modified handle function - add translation update call
 
 }

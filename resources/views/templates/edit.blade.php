@@ -5,16 +5,16 @@
         <div class="content-wrapper">
             <div class="content-header row">
                 <div class="content-header-left col-md-6 col-xs-12 mb-1">
-                    <h2 class="content-header-title">Edit {{modelName}}</h2>
+                    <h2 class="content-header-title">{{ __('dashboard.{{modelNameLower}}.edit') }}</h2>
                 </div>
                 <div class="content-header-right breadcrumbs-right breadcrumbs-top col-md-6 col-xs-12">
                     <div class="breadcrumb-wrapper col-xs-12">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a>
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('dashboard.common.dashboard') }}</a>
                             </li>
-                            <li class="breadcrumb-item"><a href="{{ route('{{viewPath}}.index') }}">{{modelName}} Management</a>
+                            <li class="breadcrumb-item"><a href="{{ route('{{viewPath}}.index') }}">{{ __('dashboard.{{modelNameLower}}.management') }}</a>
                             </li>
-                            <li class="breadcrumb-item active">Edit {{modelName}}
+                            <li class="breadcrumb-item active">{{ __('dashboard.{{modelNameLower}}.edit') }}
                             </li>
                         </ol>
                     </div>
@@ -26,7 +26,7 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title" id="basic-layout-tooltip">Edit {{modelName}} #{{ ${{modelNameLowerCase}}->id }}</h4>
+                                    <h4 class="card-title" id="basic-layout-tooltip">{{ __('dashboard.{{modelNameLower}}.edit') }} {{ __('dashboard.{{modelNameLower}}.title') }} #{{ ${{modelNameLowerCase}}->id }}</h4>
                                     <a class="heading-elements-toggle"><i class="icon-ellipsis font-medium-3"></i></a>
                                     <div class="heading-elements">
                                         <ul class="list-inline mb-0">
@@ -40,7 +40,7 @@
                                 <div class="card-body collapse in">
                                     <div class="card-block">
                                         <div class="card-text">
-                                            <p>Update the information for this {{modelName}}.</p>
+                                            <p>{{ __('dashboard.{{modelNameLower}}.update_info') }}</p>
                                         </div>
 
                                         <form class="form" method="POST" action="{{ route('{{viewPath}}.update', ${{modelNameLowerCase}}->id) }}" enctype="multipart/form-data">
@@ -52,10 +52,10 @@
 
                                             <div class="form-actions">
                                                 <a href="{{ route('{{viewPath}}.index') }}" class="btn btn-warning mr-1">
-                                                    <i class="icon-cross2"></i> Cancel
+                                                    <i class="icon-cross2"></i> {{ __('dashboard.common.cancel') }}
                                                 </a>
                                                 <button type="submit" class="btn btn-primary">
-                                                    <i class="icon-check2"></i> Update
+                                                    <i class="icon-check2"></i> {{ __('dashboard.common.update') }}
                                                 </button>
                                             </div>
                                         </form>

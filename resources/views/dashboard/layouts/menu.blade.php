@@ -6,7 +6,7 @@
 {{--        </li>--}}
 {{--    </ul>--}}
 {{--</li>--}}
-<li class=" nav-item"><a href="changelog.html"><i class="icon-copy"></i><span data-i18n="nav.changelog.main" class="menu-title">Dashboard</span><span class="tag tag tag-pill tag-danger float-xs-right">1.0</span></a>
+<li class=" nav-item"><a href="{{route('dashboard')}}"><i class="icon-copy"></i><span data-i18n="nav.changelog.main" class="menu-title">Dashboard</span></a>
 </li>
 
 @can('view_role')
@@ -19,3 +19,14 @@
 </li>
 @endcan
 
+
+@can('view_post')
+<li class=" nav-item"><a href="{{ route('posts.index') }}"><i class="icon-list"></i><span data-i18n="nav.posts.main" class="menu-title">Posts</span></a>
+</li>
+@endcan
+
+
+@can('view_post')
+<li class=" nav-item"><a href="{{ route('posts.index') }}"><i class="icon-list"></i><span data-i18n="nav.posts.main" class="menu-title">{{__('dashboard.post.title_plural')}}</span></a>
+</li>
+@endcan
