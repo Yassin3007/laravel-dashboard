@@ -88,6 +88,8 @@
                                         @endforelse
                                         </tbody>
                                     </table>
+                                    {{${{modelNamePluralLowerCase}}->links()}}
+
                                 </div>
                             </div>
                         </div>

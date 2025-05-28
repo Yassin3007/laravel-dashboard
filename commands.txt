@@ -22,3 +22,8 @@
 
 
       php artisan make:crud User  --fields=name_en:string,name_ar:string,company_id:integer,team_id:integer,is_active:boolean,image:string,email:string,password:string,phone:string  --validation='{"name_en":"required|max:255","name_ar":"required|max:255","is_active":"required","company_id":"required","team_id":"required","image":"nullable","phone":"required","email":"required","password":"required"}'  --relationships='{"belongsTo":["Company"],"belongsTo":["Team"]}'
+
+
+
+
+      php artisan make:crud Category  --fields=name_en:string,name_ar:string,company_id:integer,is_active:boolean  --validation='{"name_en":"required|max:255","name_ar":"required|max:255","is_active":"required","company_id":"required"}'  --relationships='{"belongsTo":["Company"]}'

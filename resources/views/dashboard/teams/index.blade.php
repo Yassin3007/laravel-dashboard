@@ -10,7 +10,8 @@
                 <div class="content-header-right breadcrumbs-right breadcrumbs-top col-md-6 col-xs-12">
                     <div class="breadcrumb-wrapper col-xs-12">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('dashboard.common.dashboard') }}</a>
+                            <li class="breadcrumb-item"><a
+                                    href="{{ route('dashboard') }}">{{ __('dashboard.common.dashboard') }}</a>
                             </li>
                             <li class="breadcrumb-item active">{{ __('dashboard.team.title') }}
                             </li>
@@ -49,9 +50,9 @@
                                         <tr>
                                             <th>{{ __('dashboard.common.number') }}</th>
                                             <th>{{ __("dashboard.team.fields.name_en") }}</th>
-                <th>{{ __("dashboard.team.fields.name_ar") }}</th>
-                <th>{{ __("dashboard.company.title") }}</th>
-                <th>{{ __("dashboard.team.fields.is_active") }}</th>
+                                            <th>{{ __("dashboard.team.fields.name_ar") }}</th>
+                                            <th>{{ __("dashboard.company.title") }}</th>
+                                            <th>{{ __("dashboard.team.fields.is_active") }}</th>
                                             <th>{{ __('dashboard.common.actions') }}</th>
                                         </tr>
                                         </thead>
@@ -60,27 +61,31 @@
                                             <tr>
                                                 <th scope="row">{{ $loop->iteration }}</th>
                                                 <td>{{ $team->name_en }}</td>
-                <td>{{ $team->name_ar }}</td>
-                <td>{{ $team->company->name }}</td>
-                <td>{{ $team->is_active ? 'Yes' : 'No' }}</td>
+                                                <td>{{ $team->name_ar }}</td>
+                                                <td>{{ $team->company->name }}</td>
+                                                <td>{{ $team->is_active ? 'Yes' : 'No' }}</td>
                                                 <td>
                                                     @can('view_team')
-                                                        <a href="{{ route('teams.show', $team->id) }}" class="btn btn-info btn-sm">
+                                                        <a href="{{ route('teams.show', $team->id) }}"
+                                                           class="btn btn-info btn-sm">
                                                             <i class="icon-eye6"></i> {{ __('dashboard.common.view') }}
                                                         </a>
                                                     @endcan
 
                                                     @can('edit_team')
-                                                        <a href="{{ route('teams.edit', $team->id) }}" class="btn btn-warning btn-sm">
+                                                        <a href="{{ route('teams.edit', $team->id) }}"
+                                                           class="btn btn-warning btn-sm">
                                                             <i class="icon-pencil3"></i> {{ __('dashboard.common.edit') }}
                                                         </a>
                                                     @endcan
 
                                                     @can('delete_team')
-                                                        <form action="{{ route('teams.destroy', $team->id) }}" method="POST" style="display: inline-block;">
+                                                        <form action="{{ route('teams.destroy', $team->id) }}"
+                                                              method="POST" style="display: inline-block;">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('dashboard.team.delete_confirm') }}');">
+                                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                                    onclick="return confirm('{{ __('dashboard.team.delete_confirm') }}');">
                                                                 <i class="icon-trash4"></i> {{ __('dashboard.common.delete') }}
                                                             </button>
                                                         </form>
@@ -89,11 +94,13 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="{{ 2 + count(Schema::getColumnListing('teams')) }}" class="text-center">{{ __('dashboard.team.no_records') }}</td>
+                                                <td colspan="{{ 2 + count(Schema::getColumnListing('teams')) }}"
+                                                    class="text-center">{{ __('dashboard.team.no_records') }}</td>
                                             </tr>
                                         @endforelse
                                         </tbody>
                                     </table>
+                                    {{$teams->links()}}
                                 </div>
                             </div>
                         </div>

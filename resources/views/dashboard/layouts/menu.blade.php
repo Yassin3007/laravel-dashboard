@@ -45,3 +45,7 @@
 <li class=" nav-item"><a href="{{ route('users.index') }}"><i class="icon-list"></i><span data-i18n="nav.users.main" class="menu-title">{{__('dashboard.user.title_plural')}}</span></a>
 </li>
 @endcan
+@can('view_category')
+<li class=" nav-item"><a href="{{ route('categories.index') }}"><i class="icon-list"></i><span data-i18n="nav.categories.main" class="menu-title">{{__('dashboard.category.title_plural')}}</span></a>
+</li>
+@endcan
