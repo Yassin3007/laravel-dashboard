@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class {{modelName}} extends Model
+class Team extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class {{modelName}} extends Model
      *
      * @var array
      */
-    protected $fillable = [{{fillable}}];
+    protected $fillable = ['name_en', 'name_ar', 'company_id', 'is_active'];
 
     /**
      * Get the table associated with the model.
@@ -33,5 +33,8 @@ class {{modelName}} extends Model
      }
 
 
-    {{relationships}}
+    public function company()
+    {
+        return $this->belongsTo(\App\Models\Company::class);
+    }
 }

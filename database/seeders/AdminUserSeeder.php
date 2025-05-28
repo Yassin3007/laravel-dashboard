@@ -15,17 +15,19 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         $adminUser = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'), // Change this password!
+            'name_en' => 'Admin User',
+            'name_ar' => 'سوبر ادمن',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make(12345678), // Change this password!
             'email_verified_at' => now(),
+            'is_active' => true,
         ]);
 
         // Assign admin role to the user
-        $adminUser->assignRole('admin');
+        $adminUser->assignRole('super-admin');
 
         $this->command->info('Admin user created successfully!');
-        $this->command->info('Email: admin@example.com');
-        $this->command->info('Password: password (Please change this!)');
+        $this->command->info('Email: admin@admin.com');
+        $this->command->info('Password: password (12345678)');
     }
 }

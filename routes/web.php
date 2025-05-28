@@ -5,6 +5,9 @@ use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\RoleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\PostController;
+use App\Http\Controllers\Dashboard\CompanyController;
+use App\Http\Controllers\Dashboard\TeamController;
+use App\Http\Controllers\Dashboard\UserController;
 
 
 Route::get('/dashboard2', function () {
@@ -33,7 +36,7 @@ Route::get('/reset-password', [App\Http\Controllers\AuthController::class, 'show
 
 // Profile routes (protected by auth middleware)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard2', function () {
+    Route::get('/statistics', function () {
 
         return view('dashboard.temp.index');
     })->name('dashboard');
@@ -126,4 +129,97 @@ Route::middleware(['auth'])->group(function() {
 
 
 
-;
+// Routes for Company
+Route::middleware(['auth'])->group(function() {
+    Route::get('companies', [CompanyController::class, 'index'])
+        ->name('companies.index')
+        ->middleware('can:view_company');
+
+    Route::get('companies/create', [CompanyController::class, 'create'])
+        ->name('companies.create')
+        ->middleware('can:create_company');
+
+    Route::post('companies', [CompanyController::class, 'store'])
+        ->name('companies.store')
+        ->middleware('can:create_company');
+
+    Route::get('companies/{company}', [CompanyController::class, 'show'])
+        ->name('companies.show')
+        ->middleware('can:view_company');
+
+    Route::get('companies/{company}/edit', [CompanyController::class, 'edit'])
+        ->name('companies.edit')
+        ->middleware('can:edit_company');
+
+    Route::put('companies/{company}', [CompanyController::class, 'update'])
+        ->name('companies.update')
+        ->middleware('can:edit_company');
+
+    Route::delete('companies/{company}', [CompanyController::class, 'destroy'])
+        ->name('companies.destroy')
+        ->middleware('can:delete_company');
+});
+
+
+
+// Routes for Team
+Route::middleware(['auth'])->group(function() {
+    Route::get('teams', [TeamController::class, 'index'])
+        ->name('teams.index')
+        ->middleware('can:view_team');
+
+    Route::get('teams/create', [TeamController::class, 'create'])
+        ->name('teams.create')
+        ->middleware('can:create_team');
+
+    Route::post('teams', [TeamController::class, 'store'])
+        ->name('teams.store')
+        ->middleware('can:create_team');
+
+    Route::get('teams/{team}', [TeamController::class, 'show'])
+        ->name('teams.show')
+        ->middleware('can:view_team');
+
+    Route::get('teams/{team}/edit', [TeamController::class, 'edit'])
+        ->name('teams.edit')
+        ->middleware('can:edit_team');
+
+    Route::put('teams/{team}', [TeamController::class, 'update'])
+        ->name('teams.update')
+        ->middleware('can:edit_team');
+
+    Route::delete('teams/{team}', [TeamController::class, 'destroy'])
+        ->name('teams.destroy')
+        ->middleware('can:delete_team');
+});
+
+// Routes for User
+Route::middleware(['auth'])->group(function() {
+    Route::get('users', [UserController::class, 'index'])
+        ->name('users.index')
+        ->middleware('can:view_user');
+
+    Route::get('users/create', [UserController::class, 'create'])
+        ->name('users.create')
+        ->middleware('can:create_user');
+
+    Route::post('users', [UserController::class, 'store'])
+        ->name('users.store')
+        ->middleware('can:create_user');
+
+    Route::get('users/{user}', [UserController::class, 'show'])
+        ->name('users.show')
+        ->middleware('can:view_user');
+
+    Route::get('users/{user}/edit', [UserController::class, 'edit'])
+        ->name('users.edit')
+        ->middleware('can:edit_user');
+
+    Route::put('users/{user}', [UserController::class, 'update'])
+        ->name('users.update')
+        ->middleware('can:edit_user');
+
+    Route::delete('users/{user}', [UserController::class, 'destroy'])
+        ->name('users.destroy')
+        ->middleware('can:delete_user');
+});

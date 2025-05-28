@@ -2,23 +2,23 @@
 
 namespace App\Services;
 
-use App\Models\{{modelName}};
+use App\Models\Team;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class {{modelName}}Service
+class TeamService
 {
-    protected {{modelName}} $model;
+    protected Team $model;
 
-    public function __construct({{modelName}} $model)
+    public function __construct(Team $model)
     {
         $this->model = $model;
     }
 
     /**
-     * Get all {{modelNamePluralLowerCase}} with pagination
+     * Get all teams with pagination
      *
      * @param int $perPage
      * @return LengthAwarePaginator
@@ -29,7 +29,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Get all {{modelNamePluralLowerCase}} without pagination
+     * Get all teams without pagination
      *
      * @return Collection
      */
@@ -39,79 +39,79 @@ class {{modelName}}Service
     }
 
     /**
-     * Find {{modelNameSingularLowerCase}} by ID
+     * Find team by ID
      *
      * @param int $id
-     * @return {{modelName}}|null
+     * @return Team|null
      */
-    public function findById(int $id): ?{{modelName}}
+    public function findById(int $id): ?Team
     {
         return $this->model->find($id);
     }
 
     /**
-     * Find {{modelNameSingularLowerCase}} by ID or fail
+     * Find team by ID or fail
      *
      * @param int $id
-     * @return {{modelName}}
+     * @return Team
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findByIdOrFail(int $id): {{modelName}}
+    public function findByIdOrFail(int $id): Team
     {
         return $this->model->findOrFail($id);
     }
 
     /**
-     * Create a new {{modelNameSingularLowerCase}}
+     * Create a new team
      *
      * @param array $data
-     * @return {{modelName}}
+     * @return Team
      * @throws \Exception
      */
-    public function create(array $data): {{modelName}}
+    public function create(array $data): Team
     {
         try {
             DB::beginTransaction();
 
-            ${{modelNameSingularLowerCase}} = $this->model->create($data);
+            $team = $this->model->create($data);
 
             DB::commit();
 
-            Log::info('{{modelName}} created successfully', ['id' => ${{modelNameSingularLowerCase}}->id]);
+            Log::info('Team created successfully', ['id' => $team->id]);
 
-            return ${{modelNameSingularLowerCase}};
+            return $team;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating {{modelName}}', ['error' => $e->getMessage(), 'data' => $data]);
+            Log::error('Error creating Team', ['error' => $e->getMessage(), 'data' => $data]);
             throw $e;
         }
     }
 
     /**
-     * Update an existing {{modelNameSingularLowerCase}}
+     * Update an existing team
      *
-     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @param Team $team
      * @param array $data
-     * @return {{modelName}}
+     * @return Team
      * @throws \Exception
      */
-    public function update({{modelName}} ${{modelNameSingularLowerCase}}, array $data): {{modelName}}
+    public function update(Team $team, array $data): Team
     {
         try {
             DB::beginTransaction();
 
-            ${{modelNameSingularLowerCase}}->update($data);
-            ${{modelNameSingularLowerCase}}->refresh();
+            $team->update($data);
+            $team->refresh();
 
             DB::commit();
 
-            Log::info('{{modelName}} updated successfully', ['id' => ${{modelNameSingularLowerCase}}->id]);
+            Log::info('Team updated successfully', ['id' => $team->id]);
 
-            return ${{modelNameSingularLowerCase}};
+            return $team;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating {{modelName}}', [
-                'id' => ${{modelNameSingularLowerCase}}->id,
+            Log::error('Error updating Team', [
+                'id' => $team->id,
                 'error' => $e->getMessage(),
                 'data' => $data
             ]);
@@ -120,28 +120,28 @@ class {{modelName}}Service
     }
 
     /**
-     * Delete a {{modelNameSingularLowerCase}}
+     * Delete a team
      *
-     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @param Team $team
      * @return bool
      * @throws \Exception
      */
-    public function delete({{modelName}} ${{modelNameSingularLowerCase}}): bool
+    public function delete(Team $team): bool
     {
         try {
             DB::beginTransaction();
 
-            $deleted = ${{modelNameSingularLowerCase}}->delete();
+            $deleted = $team->delete();
 
             DB::commit();
 
-            Log::info('{{modelName}} deleted successfully', ['id' => ${{modelNameSingularLowerCase}}->id]);
+            Log::info('Team deleted successfully', ['id' => $team->id]);
 
             return $deleted;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error deleting {{modelName}}', [
-                'id' => ${{modelNameSingularLowerCase}}->id,
+            Log::error('Error deleting Team', [
+                'id' => $team->id,
                 'error' => $e->getMessage()
             ]);
             throw $e;
@@ -149,7 +149,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Search {{modelNamePluralLowerCase}} based on criteria
+     * Search teams based on criteria
      *
      * @param array $criteria
      * @return LengthAwarePaginator
@@ -188,7 +188,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Bulk delete {{modelNamePluralLowerCase}}
+     * Bulk delete teams
      *
      * @param array $ids
      * @return int
@@ -203,7 +203,7 @@ class {{modelName}}Service
 
             DB::commit();
 
-            Log::info('Bulk delete {{modelNamePluralLowerCase}} completed', [
+            Log::info('Bulk delete teams completed', [
                 'ids' => $ids,
                 'deleted_count' => $deleted
             ]);
@@ -211,7 +211,7 @@ class {{modelName}}Service
             return $deleted;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error in bulk delete {{modelNamePluralLowerCase}}', [
+            Log::error('Error in bulk delete teams', [
                 'ids' => $ids,
                 'error' => $e->getMessage()
             ]);
@@ -220,7 +220,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Get {{modelNamePluralLowerCase}} by specific field
+     * Get teams by specific field
      *
      * @param string $field
      * @param mixed $value
@@ -232,7 +232,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Count total {{modelNamePluralLowerCase}}
+     * Count total teams
      *
      * @return int
      */
@@ -242,7 +242,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Check if {{modelNameSingularLowerCase}} exists
+     * Check if team exists
      *
      * @param int $id
      * @return bool
@@ -253,7 +253,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Get latest {{modelNamePluralLowerCase}}
+     * Get latest teams
      *
      * @param int $limit
      * @return Collection
@@ -264,34 +264,34 @@ class {{modelName}}Service
     }
 
     /**
-     * Duplicate a {{modelNameSingularLowerCase}}
+     * Duplicate a team
      *
-     * @param {{modelName}} ${{modelNameSingularLowerCase}}
-     * @return {{modelName}}
+     * @param Team $team
+     * @return Team
      * @throws \Exception
      */
-    public function duplicate({{modelName}} ${{modelNameSingularLowerCase}}): {{modelName}}
+    public function duplicate(Team $team): Team
     {
         try {
             DB::beginTransaction();
 
-            $data = ${{modelNameSingularLowerCase}}->toArray();
+            $data = $team->toArray();
             unset($data['id'], $data['created_at'], $data['updated_at']);
 
-            $new{{modelName}} = $this->model->create($data);
+            $newTeam = $this->model->create($data);
 
             DB::commit();
 
-            Log::info('{{modelName}} duplicated successfully', [
-                'original_id' => ${{modelNameSingularLowerCase}}->id,
-                'new_id' => $new{{modelName}}->id
+            Log::info('Team duplicated successfully', [
+                'original_id' => $team->id,
+                'new_id' => $newTeam->id
             ]);
 
-            return $new{{modelName}};
+            return $newTeam;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error duplicating {{modelName}}', [
-                'id' => ${{modelNameSingularLowerCase}}->id,
+            Log::error('Error duplicating Team', [
+                'id' => $team->id,
                 'error' => $e->getMessage()
             ]);
             throw $e;

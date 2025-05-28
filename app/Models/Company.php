@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class {{modelName}} extends Model
+class Company extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class {{modelName}} extends Model
      *
      * @var array
      */
-    protected $fillable = [{{fillable}}];
+    protected $fillable = ['name_en', 'name_ar', 'is_active'];
 
     /**
      * Get the table associated with the model.
@@ -22,16 +22,16 @@ class {{modelName}} extends Model
      * @return string
      */
 
-     public function getNameAttribute()
-     {
-         return $this->attributes['name_'.app()->getLocale()];
-     }
 
-     public function scopeActive($query)
-     {
-         return $query->where('is_active', 1);
-     }
+    public function getNameAttribute()
+    {
+        return $this->attributes['name_'.app()->getLocale()];
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', 1);
+    }
 
 
-    {{relationships}}
 }

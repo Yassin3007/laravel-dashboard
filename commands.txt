@@ -1,0 +1,24 @@
+
+
+
+
+
+
+
+
+
+
+    // php artisan make:crud Post --fields=title:string,content:text,published:boolean --validation='{"title":"required|max:255","content":"required"}' --relationships='{"belongsTo":["User"]}' --with-resource
+
+
+
+
+      php artisan make:crud Company --fields=name_en:string,name_ar:string,is_active,boolean  --validation='{"name_en":"required|max:255","name_ar":"required|max:255","is_active":"required"}'
+
+
+
+      php artisan make:crud Team  --fields=name_en:string,name_ar:string,company_id:integer,is_active:boolean  --validation='{"name_en":"required|max:255","name_ar":"required|max:255","is_active":"required","company_id":"required"}'  --relationships='{"belongsTo":["Company"]}'
+
+
+
+      php artisan make:crud User  --fields=name_en:string,name_ar:string,company_id:integer,team_id:integer,is_active:boolean,image:string,email:string,password:string,phone:string  --validation='{"name_en":"required|max:255","name_ar":"required|max:255","is_active":"required","company_id":"required","team_id":"required","image":"nullable","phone":"required","email":"required","password":"required"}'  --relationships='{"belongsTo":["Company"],"belongsTo":["Team"]}'

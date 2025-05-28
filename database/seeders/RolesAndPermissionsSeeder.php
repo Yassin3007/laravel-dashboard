@@ -2,76 +2,73 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use App\Models\User;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
-        // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        // Get all registered routes
+        $routes = Route::getRoutes();
+        $permissions = [];
 
-        // Define all permissions based on your routes
-        $permissions = [
-            // Role permissions
-            'view_role',
-            'create_role',
-            'edit_role',
-            'delete_role',
+        foreach ($routes as $route) {
+            // Optional: Filter by route prefix or name pattern
+            // if (!str_starts_with($route->getName(), 'admin.')) continue;
 
-            // Permission permissions
-            'view_permission',
-            'create_permission',
-            'edit_permission',
-            'delete_permission',
-        ];
+            // Get middleware for this route
+            $middleware = $route->middleware();
 
-        // Create permissions
-        foreach ($permissions as $permission) {
-            Permission::query()->updateOrCreate([
-                'name' => $permission,
-                'guard_name' => 'web'
-            ]);
+            // Look for 'can:' middleware
+            foreach ($middleware as $middlewareItem) {
+                if (is_string($middlewareItem) && str_starts_with($middlewareItem, 'can:')) {
+                    // Extract permission name after 'can:'
+                    $permissionName = substr($middlewareItem, 4);
+                    $permissions[] = $permissionName;
+                } elseif (is_array($middlewareItem) && isset($middlewareItem[0]) && $middlewareItem[0] === 'can') {
+                    // Handle array format: ['can', 'permission_name']
+                    if (isset($middlewareItem[1])) {
+                        $permissions[] = $middlewareItem[1];
+                    }
+                }
+            }
         }
 
-        // Create Admin role
-        $adminRole = Role::query()->updateOrCreate([
-            'name' => 'admin',
-            'guard_name' => 'web'
-        ]);
+        // Remove duplicates
+        $permissions = array_unique($permissions);
 
-        // Assign all permissions to admin role
-        $adminRole->givePermissionTo($permissions);
+        // Create permissions in database
+        $createdPermissions = [];
+        foreach ($permissions as $permission) {
+            $createdPermissions[] = Permission::firstOrCreate(['name' => $permission]);
+        }
 
-        // Optional: Create other roles with specific permissions
-        $userRole = Role::query()->updateOrCreate([
-            'name' => 'user',
-            'guard_name' => 'web'
-        ]);
+        // Create Super Admin role
+        $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
 
-        // Give user role only view permissions
-        $userRole->givePermissionTo([
-            'view_role',
-            'view_permission'
-        ]);
+        // Assign all permissions to Super Admin role
+        $superAdminRole->syncPermissions($createdPermissions);
 
-        // Optional: Create a super admin role (if needed)
-        $superAdminRole = Role::query()->updateOrCreate([
-            'name' => 'super-admin',
-            'guard_name' => 'web'
-        ]);
+//        // Optional: Create a super admin user
+//        $superAdmin = User::firstOrCreate(
+//            ['email' => 'admin@example.com'],
+//            [
+//                'name' => 'Super Admin',
+//                'password' => Hash::make('password'), // Change this!
+//                'email_verified_at' => now(),
+//            ]
+//        );
 
-        // Super admin gets all permissions
-        $superAdminRole->givePermissionTo($permissions);
+        // Assign super_admin role to the user
 
-        $this->command->info('Roles and Permissions created successfully!');
-        $this->command->info('Created permissions: ' . implode(', ', $permissions));
-        $this->command->info('Created roles: admin, user, super-admin');
+        $this->command->info('Created ' . count($permissions) . ' permissions from routes.');
+        $this->command->info('Permissions: ' . implode(', ', $permissions));
+        $this->command->info('Created Super Admin role with all permissions assigned.');
+        $this->command->info('Created Super Admin user: admin@example.com');
     }
 }

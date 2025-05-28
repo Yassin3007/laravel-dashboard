@@ -2,23 +2,23 @@
 
 namespace App\Services;
 
-use App\Models\{{modelName}};
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class {{modelName}}Service
+class UserService
 {
-    protected {{modelName}} $model;
+    protected User $model;
 
-    public function __construct({{modelName}} $model)
+    public function __construct(User $model)
     {
         $this->model = $model;
     }
 
     /**
-     * Get all {{modelNamePluralLowerCase}} with pagination
+     * Get all users with pagination
      *
      * @param int $perPage
      * @return LengthAwarePaginator
@@ -29,7 +29,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Get all {{modelNamePluralLowerCase}} without pagination
+     * Get all users without pagination
      *
      * @return Collection
      */
@@ -39,79 +39,79 @@ class {{modelName}}Service
     }
 
     /**
-     * Find {{modelNameSingularLowerCase}} by ID
+     * Find user by ID
      *
      * @param int $id
-     * @return {{modelName}}|null
+     * @return User|null
      */
-    public function findById(int $id): ?{{modelName}}
+    public function findById(int $id): ?User
     {
         return $this->model->find($id);
     }
 
     /**
-     * Find {{modelNameSingularLowerCase}} by ID or fail
+     * Find user by ID or fail
      *
      * @param int $id
-     * @return {{modelName}}
+     * @return User
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findByIdOrFail(int $id): {{modelName}}
+    public function findByIdOrFail(int $id): User
     {
         return $this->model->findOrFail($id);
     }
 
     /**
-     * Create a new {{modelNameSingularLowerCase}}
+     * Create a new user
      *
      * @param array $data
-     * @return {{modelName}}
+     * @return User
      * @throws \Exception
      */
-    public function create(array $data): {{modelName}}
+    public function create(array $data): User
     {
         try {
             DB::beginTransaction();
 
-            ${{modelNameSingularLowerCase}} = $this->model->create($data);
+            $user = $this->model->create($data);
 
             DB::commit();
 
-            Log::info('{{modelName}} created successfully', ['id' => ${{modelNameSingularLowerCase}}->id]);
+            Log::info('User created successfully', ['id' => $user->id]);
 
-            return ${{modelNameSingularLowerCase}};
+            return $user;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating {{modelName}}', ['error' => $e->getMessage(), 'data' => $data]);
+            Log::error('Error creating User', ['error' => $e->getMessage(), 'data' => $data]);
             throw $e;
         }
     }
 
     /**
-     * Update an existing {{modelNameSingularLowerCase}}
+     * Update an existing user
      *
-     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @param User $user
      * @param array $data
-     * @return {{modelName}}
+     * @return User
      * @throws \Exception
      */
-    public function update({{modelName}} ${{modelNameSingularLowerCase}}, array $data): {{modelName}}
+    public function update(User $user, array $data): User
     {
         try {
             DB::beginTransaction();
 
-            ${{modelNameSingularLowerCase}}->update($data);
-            ${{modelNameSingularLowerCase}}->refresh();
+            $user->update($data);
+            $user->refresh();
 
             DB::commit();
 
-            Log::info('{{modelName}} updated successfully', ['id' => ${{modelNameSingularLowerCase}}->id]);
+            Log::info('User updated successfully', ['id' => $user->id]);
 
-            return ${{modelNameSingularLowerCase}};
+            return $user;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating {{modelName}}', [
-                'id' => ${{modelNameSingularLowerCase}}->id,
+            Log::error('Error updating User', [
+                'id' => $user->id,
                 'error' => $e->getMessage(),
                 'data' => $data
             ]);
@@ -120,28 +120,28 @@ class {{modelName}}Service
     }
 
     /**
-     * Delete a {{modelNameSingularLowerCase}}
+     * Delete a user
      *
-     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @param User $user
      * @return bool
      * @throws \Exception
      */
-    public function delete({{modelName}} ${{modelNameSingularLowerCase}}): bool
+    public function delete(User $user): bool
     {
         try {
             DB::beginTransaction();
 
-            $deleted = ${{modelNameSingularLowerCase}}->delete();
+            $deleted = $user->delete();
 
             DB::commit();
 
-            Log::info('{{modelName}} deleted successfully', ['id' => ${{modelNameSingularLowerCase}}->id]);
+            Log::info('User deleted successfully', ['id' => $user->id]);
 
             return $deleted;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error deleting {{modelName}}', [
-                'id' => ${{modelNameSingularLowerCase}}->id,
+            Log::error('Error deleting User', [
+                'id' => $user->id,
                 'error' => $e->getMessage()
             ]);
             throw $e;
@@ -149,7 +149,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Search {{modelNamePluralLowerCase}} based on criteria
+     * Search users based on criteria
      *
      * @param array $criteria
      * @return LengthAwarePaginator
@@ -188,7 +188,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Bulk delete {{modelNamePluralLowerCase}}
+     * Bulk delete users
      *
      * @param array $ids
      * @return int
@@ -203,7 +203,7 @@ class {{modelName}}Service
 
             DB::commit();
 
-            Log::info('Bulk delete {{modelNamePluralLowerCase}} completed', [
+            Log::info('Bulk delete users completed', [
                 'ids' => $ids,
                 'deleted_count' => $deleted
             ]);
@@ -211,7 +211,7 @@ class {{modelName}}Service
             return $deleted;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error in bulk delete {{modelNamePluralLowerCase}}', [
+            Log::error('Error in bulk delete users', [
                 'ids' => $ids,
                 'error' => $e->getMessage()
             ]);
@@ -220,7 +220,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Get {{modelNamePluralLowerCase}} by specific field
+     * Get users by specific field
      *
      * @param string $field
      * @param mixed $value
@@ -232,7 +232,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Count total {{modelNamePluralLowerCase}}
+     * Count total users
      *
      * @return int
      */
@@ -242,7 +242,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Check if {{modelNameSingularLowerCase}} exists
+     * Check if user exists
      *
      * @param int $id
      * @return bool
@@ -253,7 +253,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Get latest {{modelNamePluralLowerCase}}
+     * Get latest users
      *
      * @param int $limit
      * @return Collection
@@ -264,34 +264,34 @@ class {{modelName}}Service
     }
 
     /**
-     * Duplicate a {{modelNameSingularLowerCase}}
+     * Duplicate a user
      *
-     * @param {{modelName}} ${{modelNameSingularLowerCase}}
-     * @return {{modelName}}
+     * @param User $user
+     * @return User
      * @throws \Exception
      */
-    public function duplicate({{modelName}} ${{modelNameSingularLowerCase}}): {{modelName}}
+    public function duplicate(User $user): User
     {
         try {
             DB::beginTransaction();
 
-            $data = ${{modelNameSingularLowerCase}}->toArray();
+            $data = $user->toArray();
             unset($data['id'], $data['created_at'], $data['updated_at']);
 
-            $new{{modelName}} = $this->model->create($data);
+            $newUser = $this->model->create($data);
 
             DB::commit();
 
-            Log::info('{{modelName}} duplicated successfully', [
-                'original_id' => ${{modelNameSingularLowerCase}}->id,
-                'new_id' => $new{{modelName}}->id
+            Log::info('User duplicated successfully', [
+                'original_id' => $user->id,
+                'new_id' => $newUser->id
             ]);
 
-            return $new{{modelName}};
+            return $newUser;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error duplicating {{modelName}}', [
-                'id' => ${{modelNameSingularLowerCase}}->id,
+            Log::error('Error duplicating User', [
+                'id' => $user->id,
                 'error' => $e->getMessage()
             ]);
             throw $e;

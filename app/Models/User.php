@@ -19,13 +19,16 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'phone',
-        'image'
-    ];
+//    protected $fillable = [
+//        'name',
+//        'email',
+//        'password',
+//        'phone',
+//        'image'
+//    ];
+
+    protected $fillable = ['name_en', 'name_ar', 'company_id', 'team_id', 'is_active', 'image', 'email', 'password', 'phone'];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -111,4 +114,26 @@ class User extends Authenticatable
             $this->update(['image' => null]);
         }
     }
+
+
+    public function team()
+    {
+        return $this->belongsTo(\App\Models\Team::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Models\Company::class);
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->attributes['name_'.app()->getLocale()];
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', 1);
+    }
+
 }

@@ -30,3 +30,18 @@
 <li class=" nav-item"><a href="{{ route('posts.index') }}"><i class="icon-list"></i><span data-i18n="nav.posts.main" class="menu-title">{{__('dashboard.post.title_plural')}}</span></a>
 </li>
 @endcan
+
+@can('view_company')
+<li class=" nav-item"><a href="{{ route('companies.index') }}"><i class="icon-list"></i><span data-i18n="nav.companies.main" class="menu-title">{{__('dashboard.company.title_plural')}}</span></a>
+</li>
+@endcan
+
+
+@can('view_team')
+<li class=" nav-item"><a href="{{ route('teams.index') }}"><i class="icon-list"></i><span data-i18n="nav.teams.main" class="menu-title">{{__('dashboard.team.title_plural')}}</span></a>
+</li>
+@endcan
+@can('view_user')
+<li class=" nav-item"><a href="{{ route('users.index') }}"><i class="icon-list"></i><span data-i18n="nav.users.main" class="menu-title">{{__('dashboard.user.title_plural')}}</span></a>
+</li>
+@endcan

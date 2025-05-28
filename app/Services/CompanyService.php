@@ -2,34 +2,34 @@
 
 namespace App\Services;
 
-use App\Models\{{modelName}};
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class {{modelName}}Service
+class CompanyService
 {
-    protected {{modelName}} $model;
+    protected Company $model;
 
-    public function __construct({{modelName}} $model)
+    public function __construct(Company $model)
     {
         $this->model = $model;
     }
 
     /**
-     * Get all {{modelNamePluralLowerCase}} with pagination
+     * Get all companies with pagination
      *
      * @param int $perPage
      * @return LengthAwarePaginator
      */
-    public function getAllPaginated(int $perPage = 15 , $with = []): LengthAwarePaginator
+    public function getAllPaginated(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->model->with($with)->latest()->paginate($perPage);
+        return $this->model->latest()->paginate($perPage);
     }
 
     /**
-     * Get all {{modelNamePluralLowerCase}} without pagination
+     * Get all companies without pagination
      *
      * @return Collection
      */
@@ -39,79 +39,79 @@ class {{modelName}}Service
     }
 
     /**
-     * Find {{modelNameSingularLowerCase}} by ID
+     * Find company by ID
      *
      * @param int $id
-     * @return {{modelName}}|null
+     * @return Company|null
      */
-    public function findById(int $id): ?{{modelName}}
+    public function findById(int $id): ?Company
     {
         return $this->model->find($id);
     }
 
     /**
-     * Find {{modelNameSingularLowerCase}} by ID or fail
+     * Find company by ID or fail
      *
      * @param int $id
-     * @return {{modelName}}
+     * @return Company
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findByIdOrFail(int $id): {{modelName}}
+    public function findByIdOrFail(int $id): Company
     {
         return $this->model->findOrFail($id);
     }
 
     /**
-     * Create a new {{modelNameSingularLowerCase}}
+     * Create a new company
      *
      * @param array $data
-     * @return {{modelName}}
+     * @return Company
      * @throws \Exception
      */
-    public function create(array $data): {{modelName}}
+    public function create(array $data): Company
     {
         try {
             DB::beginTransaction();
 
-            ${{modelNameSingularLowerCase}} = $this->model->create($data);
+            $company = $this->model->create($data);
 
             DB::commit();
 
-            Log::info('{{modelName}} created successfully', ['id' => ${{modelNameSingularLowerCase}}->id]);
+            Log::info('Company created successfully', ['id' => $company->id]);
 
-            return ${{modelNameSingularLowerCase}};
+            return $company;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating {{modelName}}', ['error' => $e->getMessage(), 'data' => $data]);
+            Log::error('Error creating Company', ['error' => $e->getMessage(), 'data' => $data]);
             throw $e;
         }
     }
 
     /**
-     * Update an existing {{modelNameSingularLowerCase}}
+     * Update an existing company
      *
-     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @param Company $company
      * @param array $data
-     * @return {{modelName}}
+     * @return Company
      * @throws \Exception
      */
-    public function update({{modelName}} ${{modelNameSingularLowerCase}}, array $data): {{modelName}}
+    public function update(Company $company, array $data): Company
     {
         try {
             DB::beginTransaction();
 
-            ${{modelNameSingularLowerCase}}->update($data);
-            ${{modelNameSingularLowerCase}}->refresh();
+            $company->update($data);
+            $company->refresh();
 
             DB::commit();
 
-            Log::info('{{modelName}} updated successfully', ['id' => ${{modelNameSingularLowerCase}}->id]);
+            Log::info('Company updated successfully', ['id' => $company->id]);
 
-            return ${{modelNameSingularLowerCase}};
+            return $company;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating {{modelName}}', [
-                'id' => ${{modelNameSingularLowerCase}}->id,
+            Log::error('Error updating Company', [
+                'id' => $company->id,
                 'error' => $e->getMessage(),
                 'data' => $data
             ]);
@@ -120,28 +120,28 @@ class {{modelName}}Service
     }
 
     /**
-     * Delete a {{modelNameSingularLowerCase}}
+     * Delete a company
      *
-     * @param {{modelName}} ${{modelNameSingularLowerCase}}
+     * @param Company $company
      * @return bool
      * @throws \Exception
      */
-    public function delete({{modelName}} ${{modelNameSingularLowerCase}}): bool
+    public function delete(Company $company): bool
     {
         try {
             DB::beginTransaction();
 
-            $deleted = ${{modelNameSingularLowerCase}}->delete();
+            $deleted = $company->delete();
 
             DB::commit();
 
-            Log::info('{{modelName}} deleted successfully', ['id' => ${{modelNameSingularLowerCase}}->id]);
+            Log::info('Company deleted successfully', ['id' => $company->id]);
 
             return $deleted;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error deleting {{modelName}}', [
-                'id' => ${{modelNameSingularLowerCase}}->id,
+            Log::error('Error deleting Company', [
+                'id' => $company->id,
                 'error' => $e->getMessage()
             ]);
             throw $e;
@@ -149,7 +149,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Search {{modelNamePluralLowerCase}} based on criteria
+     * Search companies based on criteria
      *
      * @param array $criteria
      * @return LengthAwarePaginator
@@ -188,7 +188,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Bulk delete {{modelNamePluralLowerCase}}
+     * Bulk delete companies
      *
      * @param array $ids
      * @return int
@@ -203,7 +203,7 @@ class {{modelName}}Service
 
             DB::commit();
 
-            Log::info('Bulk delete {{modelNamePluralLowerCase}} completed', [
+            Log::info('Bulk delete companies completed', [
                 'ids' => $ids,
                 'deleted_count' => $deleted
             ]);
@@ -211,7 +211,7 @@ class {{modelName}}Service
             return $deleted;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error in bulk delete {{modelNamePluralLowerCase}}', [
+            Log::error('Error in bulk delete companies', [
                 'ids' => $ids,
                 'error' => $e->getMessage()
             ]);
@@ -220,7 +220,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Get {{modelNamePluralLowerCase}} by specific field
+     * Get companies by specific field
      *
      * @param string $field
      * @param mixed $value
@@ -232,7 +232,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Count total {{modelNamePluralLowerCase}}
+     * Count total companies
      *
      * @return int
      */
@@ -242,7 +242,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Check if {{modelNameSingularLowerCase}} exists
+     * Check if company exists
      *
      * @param int $id
      * @return bool
@@ -253,7 +253,7 @@ class {{modelName}}Service
     }
 
     /**
-     * Get latest {{modelNamePluralLowerCase}}
+     * Get latest companies
      *
      * @param int $limit
      * @return Collection
@@ -264,34 +264,34 @@ class {{modelName}}Service
     }
 
     /**
-     * Duplicate a {{modelNameSingularLowerCase}}
+     * Duplicate a company
      *
-     * @param {{modelName}} ${{modelNameSingularLowerCase}}
-     * @return {{modelName}}
+     * @param Company $company
+     * @return Company
      * @throws \Exception
      */
-    public function duplicate({{modelName}} ${{modelNameSingularLowerCase}}): {{modelName}}
+    public function duplicate(Company $company): Company
     {
         try {
             DB::beginTransaction();
 
-            $data = ${{modelNameSingularLowerCase}}->toArray();
+            $data = $company->toArray();
             unset($data['id'], $data['created_at'], $data['updated_at']);
 
-            $new{{modelName}} = $this->model->create($data);
+            $newCompany = $this->model->create($data);
 
             DB::commit();
 
-            Log::info('{{modelName}} duplicated successfully', [
-                'original_id' => ${{modelNameSingularLowerCase}}->id,
-                'new_id' => $new{{modelName}}->id
+            Log::info('Company duplicated successfully', [
+                'original_id' => $company->id,
+                'new_id' => $newCompany->id
             ]);
 
-            return $new{{modelName}};
+            return $newCompany;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error duplicating {{modelName}}', [
-                'id' => ${{modelNameSingularLowerCase}}->id,
+            Log::error('Error duplicating Company', [
+                'id' => $company->id,
                 'error' => $e->getMessage()
             ]);
             throw $e;
